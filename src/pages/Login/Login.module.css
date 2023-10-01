@@ -1,0 +1,110 @@
+.loginSignupDiv {
+  display: flex;
+  padding: 80px 20px 20px;
+  justify-content: space-around;
+}
+.loginDiv {
+  text-align: start;
+  margin-right: 20px;
+  max-width: 45%;
+}
+.signupDiv {
+  padding-top: 60px;
+  text-align: start;
+  max-width: 45%;
+}
+.loginDiv > p {
+  margin-bottom: 15px;
+}
+.loginDiv > form > input {
+  display: block;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  width: 70%;
+}
+.loginPasswordDiv {
+  position: relative;
+}
+.loginPasswordDiv > input {
+  display: block;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  width: 70%;
+}
+.showPassEyeDiv {
+  position: absolute;
+  left: 69%;
+  top: 55%;
+}
+#errorWarningPTag {
+  color: red;
+  margin: 10px;
+}
+.loginDiv > form > input:focus {
+  outline: none;
+  border-color: rgb(65, 109, 109);
+}
+#loginBtn {
+  padding: 8px 20px;
+  margin: 20px 0px;
+  cursor: pointer;
+  background-color: rgb(65, 109, 109);
+  color: whitesmoke;
+  border: none;
+}
+#loginBtn:hover {
+  background-color: darkslategray;
+  opacity: 1;
+}
+#logoutBtn {
+  padding: 8px 20px;
+  margin: 20px 0px;
+  cursor: pointer;
+  background-color: rgb(232, 30, 30);
+  color: whitesmoke;
+  border: none;
+}
+#logoutBtn:hover {
+  background-color: rgb(196, 0, 0);
+  opacity: 1;
+}
+#forgetPasswordBtn {
+  padding: 8px 20px;
+  margin: 20px 0px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  margin: 0 20px;
+}
+#forgetPasswordBtn:hover {
+  text-decoration: underline;
+}
+.moveToSignupBtn {
+  padding: 8px 20px;
+  margin: 20px 0px;
+  cursor: pointer;
+  background-color: rgb(65, 109, 109);
+  color: whitesmoke;
+  border: none;
+}
+.moveToSignupBtn:hover {
+  background-color: darkslategray;
+  opacity: 1;
+}
+@media screen and (max-width: 500px) {
+  .loginSignupDiv {
+    display: block;
+    padding: 80px 20px 20px;
+  }
+  .loginDiv {
+    text-align: start;
+    max-width: 100%;
+  }
+  .signupDiv {
+    padding-top: 60px;
+    text-align: start;
+    max-width: 100%;
+  }
+}
