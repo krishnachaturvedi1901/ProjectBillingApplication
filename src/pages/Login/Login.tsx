@@ -66,71 +66,84 @@ const Login = () => {
   }
 
   return (
-    <div className={styles.loginSignupDiv}>
-      <div className={styles.loginDiv}>
-        <h1>Admin Login</h1>
-        <h4>REGISTERED ADMIN</h4>
-        <hr />
-        {isAuth ? (
-          <p>
-            Hlw, {data && data.userDto ? data.userDto.name : "Admin"} login
-            successfull want to logout.
-          </p>
-        ) : (
-          <p>
-            If you have an account, sign in with email address. In case of any
-            signing issue, please use Forgot Password link.
-          </p>
-        )}
-        {isAuth ? (
-          <button id={styles.logoutBtn} onClick={() => handleLogout()}>
-            Logout
-          </button>
-        ) : (
-          <form onSubmit={(e) => handleSubmit(e)}>
-            {isError ? (
-              <p id={styles.errorWarningPTag}>
-                User with give email or password not found! Try using right
-                email and password.
-              </p>
-            ) : null}
-            {isLoading ? <h4>Loading ...</h4> : null}
-            <label htmlFor="email">Email:</label>
-            <br />
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter email"
-              name="email"
-              required
-              onChange={(e) => handleChange(e)}
-            />
-            <div className={styles.loginPasswordDiv}>
-              <label htmlFor="password">Password:</label>
+    <div className="md:flex h-screen m-0 p-0  ">
+      <div className={styles.loginSignupDiv}>
+        <div className={styles.loginDiv}>
+          <h1 className="text-3xl mb-5">Admin Login</h1>
+          <hr />
+          {isAuth ? (
+            <p>
+              Hlw, {data && data.userDto ? data.userDto.name : "Admin"} login
+              successfull want to logout.
+            </p>
+          ) : (
+            <p className="text-slate-500">
+              If you have an account, sign in with email address. In case of any
+              signing issue, please use Forgot Password link.
+            </p>
+          )}
+          {isAuth ? (
+            <button id={styles.logoutBtn} onClick={() => handleLogout()}>
+              Logout
+            </button>
+          ) : (
+            <form onSubmit={(e) => handleSubmit(e)}>
+              {isError ? (
+                <p id={styles.errorWarningPTag}>
+                  User with give email or password not found! Try using right
+                  email and password.
+                </p>
+              ) : null}
+              {isLoading ? <h4>Loading ...</h4> : null}
+              <label htmlFor="email">Email:</label>
               <br />
               <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                placeholder="Enter password"
-                name="password"
+                type="email"
+                id="email"
+                placeholder="Enter email"
+                name="email"
                 required
                 onChange={(e) => handleChange(e)}
               />
-              <div
-                className={styles.showPassEyeDiv}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+              <div className={styles.loginPasswordDiv}>
+                <label htmlFor="password">Password:</label>
+                <br />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="Enter password"
+                  name="password"
+                  required
+                  onChange={(e) => handleChange(e)}
+                />
+                <div
+                  className={styles.showPassEyeDiv}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                </div>
               </div>
-            </div>
-            {!isAuth ? (
-              <button id={styles.loginBtn} type="submit">
-                Login
-              </button>
-            ) : null}
-            <button id={styles.forgetPasswordBtn}>Forget password ?</button>
-          </form>
-        )}
+              {!isAuth ? (
+                <button id={styles.loginBtn} type="submit">
+                  Login
+                </button>
+              ) : null}
+              <button id={styles.forgetPasswordBtn}>Forget password ?</button>
+            </form>
+          )}
+        </div>
+      </div>
+      <div className="bg-colorMediumDark md:w-2/3 sm:h-40 md:h-auto  text-colorLightFont p-24 md:text-6xl md:flex justify-start items-center flex-col m-0  ">
+        <div className="md:flex flex-col gap-8">
+          <p>Your</p>
+          <p>Personal</p>
+          <p>
+            <mark className="p-1 rounded-md bg-colorNormalButtonHover ">
+              Billing
+            </mark>
+          </p>
+          <p>Patner</p>
+        </div>
       </div>
     </div>
   );

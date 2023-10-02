@@ -2,16 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: Poppins-Bold;
+  src: url("../src/utils/font/Poppins-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: Poppins-Regular;
+  src: url("../src/utils/font/Poppins-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: Poppins-Thin;
+  src: url("../src/utils/font/Poppins-Thin.ttf") format("truetype");
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Poppins-regular", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+:root {
+  --colorDark: #1d3557;
+  --colorMediumDark:#33578a
+  --colorMedium: #457b9d;
+  --colorLight: #a8dadc;
+  --colorLightFont: #f1faee;
+  --colorDarkFont: #1d3557;
+  --colorCancelButton: #e63946;
+  --colorNormalButton: #ffb703;
+  --colorNormalButtonHover: #fb8500;
 }

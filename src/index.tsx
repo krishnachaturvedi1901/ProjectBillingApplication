@@ -6,6 +6,8 @@ import reportWebVitals from "./reportWebVitals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import AuthContextProvider from "./states/context/AuthContext/AuthContext";
+import { ThemeContextProvider } from "./states/context/ThemeContext/ThemeContext";
+import { WindowWidthContextProvider } from "./states/context/WindowWidthContext/WindowWidthContext";
 export const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -13,9 +15,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
-      <AuthContextProvider>
-        <App />
-      </AuthContextProvider>
+      <WindowWidthContextProvider>
+        <ThemeContextProvider>
+          <AuthContextProvider>
+            <App />
+          </AuthContextProvider>
+        </ThemeContextProvider>
+      </WindowWidthContextProvider>
     </QueryClientProvider>
   </BrowserRouter>
 );
