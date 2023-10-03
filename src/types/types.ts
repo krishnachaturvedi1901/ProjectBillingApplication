@@ -1,42 +1,52 @@
 export interface AdminType {
-  id: string;
-  company: string;
+  id: number;
+  companyName: string;
   companyLogo: string;
   email: string;
   password: string;
-  gstin: string;
-  address: string;
-  contact: string;
-  pancard: string;
+  gistin: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  contactNo: string;
+  pancardNo: string;
   invoiceNo: number;
 }
 export interface ClientType {
   id: number;
   clientName: string;
   email: string;
-  contact: string;
-  address: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-  gstin: string;
-  adminId: number;
+  contactNo: string;
+  pancardNo: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+  };
+  gistin: string;
+  user: number;
   conversionRate: number;
+  sameState: boolean;
 }
 export interface ProjectType {
   id: number;
   projectName: string;
-  projectManager: string;
+  projectManager?: string;
   periodFrom: string;
   periodTo: string;
   ratePerHour: number;
   workingHours: number;
-  gstin: string;
   conversionRate: number;
   paymentStatus: boolean;
   adminId: number;
   clientId: number;
+  amount: number;
 }
 export interface InvoiceType {
   id: number;

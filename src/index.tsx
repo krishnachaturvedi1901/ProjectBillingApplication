@@ -8,22 +8,26 @@ import { BrowserRouter } from "react-router-dom";
 import AuthContextProvider from "./states/context/AuthContext/AuthContext";
 import { ThemeContextProvider } from "./states/context/ThemeContext/ThemeContext";
 import { WindowWidthContextProvider } from "./states/context/WindowWidthContext/WindowWidthContext";
+import { Provider } from "react-redux";
+import { store } from "./states/redux/store";
 export const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <WindowWidthContextProvider>
-        <ThemeContextProvider>
-          <AuthContextProvider>
-            <App />
-          </AuthContextProvider>
-        </ThemeContextProvider>
-      </WindowWidthContextProvider>
-    </QueryClientProvider>
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <WindowWidthContextProvider>
+          <ThemeContextProvider>
+            <AuthContextProvider>
+              <App />
+            </AuthContextProvider>
+          </ThemeContextProvider>
+        </WindowWidthContextProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

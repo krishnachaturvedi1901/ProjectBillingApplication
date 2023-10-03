@@ -1,9 +1,9 @@
 import axios from "axios";
 import config from "../config/config";
 
-export async function getAdminByAdminId(adminId: string) {
+export async function getAdminByAdminId(adminId: number) {
   try {
-    const response = await axios(`${config.apiUrlClient}/${adminId}`);
+    const response = await axios(`${config.apiUrlAdmin}/${adminId}`);
     return response.data;
   } catch (error) {
     console.log(

@@ -1,9 +1,10 @@
 import axios from "axios";
 import config from "../config/config";
+import { ClientType } from "../types/types";
 
 export async function getAllClientsByAdminId(adminId: number) {
   try {
-    const response = await axios(`${config.apiUrlClient}/${adminId}`);
+    const response = await axios(`${config.apiUrlClient}`);
     return response.data;
   } catch (error) {
     console.log(
@@ -22,7 +23,7 @@ export async function getClientByClientId(clientId: number) {
     throw new Error("Network error during fetch client by id");
   }
 }
-export async function addClient(clientData: ClientTypes) {
+export async function addClient(clientData: ClientType) {
   try {
     const response = await axios.post(`${config.apiUrlClient}`, clientData);
     return response.data;

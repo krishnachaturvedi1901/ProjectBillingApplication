@@ -3,6 +3,7 @@ import config from "../../config/config";
 import { LoginDataType } from "../../types/types";
 
 export async function getLogin(loginData: LoginDataType) {
+  console.log("api-", config.apiUrlAuth);
   try {
     const response = await axios.post(`${config.apiUrlAuth}/login`, loginData);
     return response.data;

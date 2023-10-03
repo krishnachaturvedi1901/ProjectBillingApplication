@@ -2,25 +2,37 @@
   "admins": [
     {
       "id": 1,
-      "company": "Feeney and Sons",
-      "companyLogo": "http://dummyimage.com/113x100.png/cc0000/ffffff",
+      "companyName": "Cubexo",
+      "companyLogo": "https://www.cubexo.io/images/Logo.webp",
       "email": "bgummie0@simplemachines.org",
       "password": "mA7.9Q6G`D",
-      "gstin": "0187-0141",
-      "address": "PO Box 4748",
-      "contact": "619-563-8410",
+      "gistin": "0187-0141",
+      "address": {
+        "street": "New raiganj colony",
+        "city": "Indore",
+        "state": "Madhya Pradesh",
+        "postalCode": "482020",
+        "country": "India"
+      },
+      "contactNo": "6195638410",
       "pancard": "VTSC",
       "invoiceNo": 1
     },
     {
       "id": 2,
-      "company": "Mohr Group",
-      "companyLogo": "http://dummyimage.com/122x100.png/ff4444/ffffff",
+      "companyName": "GamaEdge",
+      "companyLogo": "https://gammaedge.io/images/logo1.png",
       "email": "aagostini1@springer.com",
       "password": "eD9_=Jkvg",
-      "gstin": "54868-1616",
-      "address": "8th Floor",
-      "contact": "264-691-5992",
+      "gistin": "54868-1616",
+      "address": {
+        "street": "New raiganj colony",
+        "city": "Indore",
+        "state": "Madhya Pradesh",
+        "postalCode": "482020",
+        "country": "India"
+      },
+      "contactNo": "2646915992",
       "pancard": "NZNP",
       "invoiceNo": 2
     }
@@ -30,71 +42,91 @@
       "id": 1,
       "clientName": "Weber-Heathcote",
       "email": "jkleinerman0@blogs.com",
-      "contact": "2932619610",
-      "address": "19th Floor",
-      "city": "R S",
-      "state": "India",
-      "country": "France",
-      "pincode": "IN",
-      "gstin": "55111-284",
-      "adminId": 1,
-      "conversionRate": 80
+      "contactNo": "2932619610",
+      "pancardNo": "HHI888L",
+      "address": {
+        "street": "New raiganj colony",
+        "city": "Indore",
+        "state": "Madhya Pradesh",
+        "postalCode": "482020",
+        "country": "India"
+      },
+      "gistin": "55111-284",
+      "user": 1,
+      "conversionRate": 80,
+      "sameState": false
     },
     {
       "id": 2,
-      "clientName": "Conn, O'Kon and Schamberger",
-      "email": "hnewarte1@engadget.com",
-      "contact": "5342100424",
-      "address": "5th Floor",
-      "city": "R S",
-      "state": "India",
-      "country": "France",
-      "pincode": "IN",
-      "gstin": "24338-106",
-      "adminId": 1,
-      "conversionRate": 82
+      "clientName": "Smith-Jones",
+      "email": "asmith1@blogs.com",
+      "contactNo": "3456789012",
+      "pancardNo": "ABCD123",
+      "address": {
+        "street": "Main Street",
+        "city": "New York",
+        "state": "New York",
+        "postalCode": "10001",
+        "country": "USA"
+      },
+      "gistin": "12345-678",
+      "user": 2,
+      "conversionRate": 85,
+      "sameState": true
     },
     {
       "id": 3,
-      "clientName": "Frami, Sipes and Leuschke",
-      "email": "jhammon2@usnews.com",
-      "contact": "3047725338",
-      "address": "Room 881",
-      "city": "Agraharam",
-      "state": "India",
-      "country": "France",
-      "pincode": "IN",
-      "gstin": "58668-1521",
-      "adminId": 2,
-      "conversionRate": 80
+      "clientName": "Johnson-Doe",
+      "email": "bjohnson2@blogs.com",
+      "contactNo": "4567890123",
+      "pancardNo": "WXYZ456",
+      "address": {
+        "street": "Maple Avenue",
+        "city": "Los Angeles",
+        "state": "California",
+        "postalCode": "90001",
+        "country": "USA"
+      },
+      "gistin": "98765-432",
+      "user": 1,
+      "conversionRate": 90,
+      "sameState": false
     },
     {
       "id": 4,
-      "clientName": "Green-Crist",
-      "email": "clichfield3@cafepress.com",
-      "contact": "6365508117",
-      "address": "PO Box 33588",
-      "city": "Agraharam",
-      "state": "India",
-      "country": "France",
-      "pincode": "IN",
-      "gstin": "17312-002",
-      "adminId": 2,
-      "conversionRate": 82
+      "clientName": "Brown-Miller",
+      "email": "cmiller3@blogs.com",
+      "contactNo": "5678901234",
+      "pancardNo": "EFGH789",
+      "address": {
+        "street": "Oak Street",
+        "city": "Chicago",
+        "state": "Illinois",
+        "postalCode": "60601",
+        "country": "USA"
+      },
+      "gistin": "54321-098",
+      "user": 2,
+      "conversionRate": 95,
+      "sameState": true
     },
     {
       "id": 5,
-      "clientName": "Mueller-VonRueden",
-      "email": "jdziwisz4@typepad.com",
-      "contact": "4623935234",
-      "address": "17th Floor",
-      "city": "R S",
-      "state": "India",
-      "country": "France",
-      "pincode": "IN",
-      "gstin": "59779-517",
-      "adminId": 2,
-      "conversionRate": 80
+      "clientName": "Davis-Williams",
+      "email": "davis4@blogs.com",
+      "contactNo": "6789012345",
+      "pancardNo": "IJKL101",
+      "address": {
+        "street": "Cedar Lane",
+        "city": "Houston",
+        "state": "Texas",
+        "postalCode": "77001",
+        "country": "USA"
+      },
+      "gistin": "13579-864",
+      "user": 1,
+      "conversionRate": 100,
+      "sameState": false
     }
   ],
   "projects": [

@@ -1,25 +1,20 @@
 import React, { useEffect } from "react";
 import styles from "./Login.module.css";
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
 import { AiOutlineEye } from "react-icons/ai";
 import { useLoginMutation } from "../../states/query/Login_queries/loginQueries";
 import { AuthContext } from "../../states/context/AuthContext/AuthContext";
 import { validateToken } from "../../states/context/AuthContext/validateToken";
+import { LinearProgress } from "@mui/material";
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [logoutExecuted, setLogoutExecuted] = useState(false);
-  const {
-    isAuth,
-    setIsAuth,
-    adminId,
-    setAdminId,
-    setAdminData,
-    logoutAdmin,
-  } = useContext(AuthContext);
+  const { isAuth, setIsAuth, adminId, setAdminId, setAdminData, logoutAdmin } =
+    useContext(AuthContext);
   const [authData, setAuthData] = useState({ email: "", password: "" });
 
   useEffect(() => {
@@ -94,7 +89,7 @@ const Login = () => {
                   email and password.
                 </p>
               ) : null}
-              {isLoading ? <h4>Loading ...</h4> : null}
+              {isLoading ? <LinearProgress /> : null}
               <label htmlFor="email">Email:</label>
               <br />
               <input

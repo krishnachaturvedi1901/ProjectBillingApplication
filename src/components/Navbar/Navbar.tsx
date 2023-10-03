@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { Outlet } from "react-router-dom";
 import { BsSun, BsMoon } from "react-icons/bs";
 import { AiOutlineLogout } from "react-icons/ai";
@@ -12,7 +12,7 @@ const Navbar = () => {
   };
   return (
     <>
-      <nav className="h-20 w-auto mb-0 bg-colorDark flex justify-between p-4  items-center text-slate-100 text-xl">
+      <nav className="h-18 w-auto mb-0 bg-colorDark flex justify-between p-4  items-center text-slate-100 text-xl">
         <div className="mx-8 font-poppins-bold text-2xl tracking-widest ">
           Biller
         </div>
