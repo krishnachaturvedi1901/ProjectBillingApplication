@@ -17,7 +17,7 @@ export interface AdminType {
   invoiceNo: number;
 }
 export interface ClientType {
-  id: number;
+  id?: number;
   clientName: string;
   email: string;
   contactNo: string;
@@ -68,3 +68,27 @@ export interface DecodedTokenDataType {
   exp: number;
   iat: number;
 }
+export type CountryInfoType = {
+  name: string;
+  isoCode: string;
+  flag: string;
+  phonecode: string;
+  currency: string;
+  latitude: string;
+  longitude: string;
+  timezones: [];
+};
+export type StateInfoType = {
+  name: string;
+  isoCode: string;
+  countryCode: string;
+  latitude: string;
+  longitude: string;
+};
+export type CityInfoType = {
+  name: string;
+  countryCode: string;
+  stateCode: string;
+  latitude: string;
+  longitude: string;
+};
