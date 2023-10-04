@@ -141,7 +141,16 @@ export default function CompoAddClient({
 
   return (
     <div>
-      <Button variant="contained" onClick={handleClickOpen}>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: "darkorchid",
+          ":hover": {
+            backgroundColor: "#7f05bc",
+          },
+        }}
+        onClick={handleClickOpen}
+      >
         Add Client
       </Button>
       <Dialog open={open} onClose={handleClose}>

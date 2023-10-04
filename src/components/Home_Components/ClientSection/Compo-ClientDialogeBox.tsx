@@ -141,7 +141,22 @@ export default function ConfirmationDialog({
           aria-label="select clients"
           onClick={handleClickListItem}
         >
-          <ListItemText primary="SELECT CLIENT" />
+          <Button
+            sx={{
+              backgroundColor: "darkorchid",
+              color: "white",
+              padding: { sx: "3px 5px", sm: "7px 8px" },
+              fontSize: { sx: "8px", sm: "14px" },
+              borderRadius: "2px",
+              transition: "background-color 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                backgroundColor: "#7f05bc",
+              },
+              boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
+            }}
+          >
+            Select Clients
+          </Button>
         </ListItem>
         <ConfirmationDialogRaw
           id="select-client-menu"

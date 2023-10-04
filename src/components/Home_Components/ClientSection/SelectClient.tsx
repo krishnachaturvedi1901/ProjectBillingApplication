@@ -40,7 +40,7 @@ const SelectClient = () => {
   const addedNewClientState = useSelector(
     (state: RootState) => state.addClientState
   );
-  // console.log("selectedClient-", selectedClient);
+  console.log("selectedClient-", selectedClient);
   // -------------------------------------------------------
 
   useEffect(() => {
@@ -118,8 +118,8 @@ const SelectClient = () => {
 
   return (
     <section>
-      <div className="flex justify-end items-center">
-        <div className="bg-colorMedium rounded-lg border border-x-colorMedium w-38 h-11 flex justify-center items-center my-4 mx-4">
+      <div className="flex justify-around sm:justify-end items-center pr-4 sm:pr-8 sticky top-16 bg-slate-100 dark:bg-slate-500 z-10 ">
+        <div>
           <ConfirmationDialog clientsArr={clientsArr} adminId={adminId} />
         </div>
         <div>
@@ -131,24 +131,26 @@ const SelectClient = () => {
           />
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row sm:justify-between  ">
-        <div className="">
+      <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-700 bg-opacity-50 shadow-lg dark:shadow-slate-800 sm:p-2 ">
+        <div className="w-1/2 ">
           {data ? (
             <div className="text-black dark:text-colorLightFont p-4">
-              <div className="bg-slate-300 h-16 w-48 p-2 mb-4 rounded-lg">
+              <div className="bg-slate-100 flex justify-start items-center  h-8 sm:h-16 w-30 sm:w-48  p-3 mb-2 rounded-lg">
                 <img
                   src={companyLogo}
                   alt="CompanyLogo"
-                  className="h-10 w-auto "
+                  className="h-auto w-auto "
                 />
               </div>
               <div className=" text-black dark:text-colorLightFont">
-                <h2 className="text-2xl my-2">{data.companyName}</h2>
+                <h3 className=" text-sm sm:text-sm mt-6 font-semibold ">
+                  {data.companyName}
+                </h3>
                 <p className="my-2">
                   <b>Gstin: </b>
                   {data.gistin}
                 </p>
-                <div className="text-black dark:text-colorLightFont opacity-70">
+                <div className="text-black dark:text-colorLightFont opacity-70 flex flex-col justify-start gap-1">
                   <p>{data.address ? data.address.street : null}</p>
                   <p>
                     {data.address
@@ -171,11 +173,13 @@ const SelectClient = () => {
             "Loding..."
           )}
         </div>
-        <div className="">
+        <div className=" border-l border-l-slate-400 ">
           {clientObj && selectedClient.loading !== "idle" ? (
-            <div className="text-black dark:text-colorLightFont p-4">
+            <div className="text-black ml-0.5 sm:ml-4 dark:text-colorLightFont p-4">
               <div className=" text-black dark:text-colorLightFont">
-                <h2 className="text-2xl my-2">{clientObj.clientName}</h2>
+                <h2 className=" text-sm sm:text-lg my-2 font-semibold">
+                  {clientObj.clientName}
+                </h2>
                 <p className="mt-2">
                   <b>Gstin: </b>
                   {clientObj.gistin}
@@ -185,7 +189,7 @@ const SelectClient = () => {
                   {clientObj.pancardNo}
                 </p>
 
-                <div className="text-black dark:text-colorLightFont opacity-70">
+                <div className="text-black dark:text-colorLightFont opacity-70 flex flex-col justify-start gap-1 ">
                   <p>{clientObj.address ? clientObj.address.street : null}</p>
                   <p>
                     {clientObj.address

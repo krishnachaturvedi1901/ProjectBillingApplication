@@ -13,8 +13,14 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [logoutExecuted, setLogoutExecuted] = useState(false);
-  const { isAuth, setIsAuth, adminId, setAdminId, setAdminData, logoutAdmin } =
-    useContext(AuthContext);
+  const {
+    isAuth,
+    setIsAuth,
+    adminId,
+    setAdminId,
+    setAdminData,
+    logoutAdmin,
+  } = useContext(AuthContext);
   const [authData, setAuthData] = useState({ email: "", password: "" });
 
   useEffect(() => {
@@ -139,7 +145,7 @@ const Login = () => {
           )}
         </div>
       </div>
-      <div className="bg-colorMediumDark md:w-2/3 sm:h-40 md:h-auto  text-colorLightFont p-24 md:text-6xl md:flex justify-start items-center flex-col m-0  ">
+      <div className=" bg-teal-800 dark:bg-slate-800 md:w-2/3 sm:h-40 md:h-auto  text-colorLightFont  p-24 md:text-6xl md:flex justify-start items-center flex-col m-0  ">
         <div className="md:flex flex-col gap-8">
           <p>Your</p>
           <p>Personal</p>
