@@ -1,7 +1,7 @@
 import { Skeleton } from "@mui/material";
 import React from "react";
 
-const Compo_Loding = () => {
+const CompoLoading = () => {
   return (
     <div className="flex justify-between items-center p-8">
       <div>
@@ -90,4 +90,4 @@ const Compo_Loding = () => {
   );
 };
 
-export default Compo_Loding;
+export default CompoLoading;

@@ -12,8 +12,8 @@ export function useLoginMutation() {
     {
       onSuccess: (data) => {
         console.log("data fater login res in useMutaion", data);
-        localStorage.setItem("authToken", JSON.stringify(data.token));
-        queryClient.setQueryData(["authToken"], data.token);
+        localStorage.setItem("billAppAuthToken", JSON.stringify(data.token));
+        queryClient.setQueryData(["billAppAuthToken"], data.token);
       },
       onError: (error) => {
         console.log("Error in login:from query", error);

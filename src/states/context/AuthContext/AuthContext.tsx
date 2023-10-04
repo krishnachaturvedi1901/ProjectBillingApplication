@@ -39,12 +39,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   const [adminData, setAdminData] = useState<AdminType>();
 
   const logoutAdmin = () => {
-    localStorage.setItem("authToken", "");
-    queryClient.setQueryData(["authToken"], null);
+    localStorage.setItem("billAppAuthToken", "");
+    queryClient.setQueryData(["billAppAuthToken"], null);
     setIsAuth(false);
     setAdminId(null);
   };
-
   return (
     <AuthContext.Provider
       value={{

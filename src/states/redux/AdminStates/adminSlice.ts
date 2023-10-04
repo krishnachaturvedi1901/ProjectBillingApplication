@@ -4,10 +4,9 @@ import { AdminType } from "../../../types/types";
 
 export const getAdminByIdAction = createAsyncThunk(
   "admin/getAdminByIdStatus",
-  async (adminId: number, ThunkApi) => {
+  async (adminId: string, ThunkApi) => {
     try {
       const res = await getAdminByAdminId(adminId);
-      console.log("res after admin get", res);
       return res;
     } catch (error) {
       return ThunkApi.rejectWithValue(`Error in gettingAdminById ${error}`);

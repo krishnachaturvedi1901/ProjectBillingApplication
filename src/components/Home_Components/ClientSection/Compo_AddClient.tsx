@@ -17,8 +17,9 @@ import {
   StateInfoType,
 } from "../../../types/types";
 import SelectCountryStateCity from "./Compo_CountrySelect";
+import { Alert, Typography } from "@mui/material";
 
-export default function Compo_AddClient({
+export default function CompoAddClient({
   open,
   handleClickOpen,
   handleClose,
@@ -27,7 +28,7 @@ export default function Compo_AddClient({
   open: boolean;
   handleClickOpen: () => void;
   handleClose: () => void;
-  user: number;
+  user: string;
 }) {
   const [selectedCountry, setSelectedCountry] = useState<CountryInfoType>(
     {} as CountryInfoType
@@ -38,7 +39,10 @@ export default function Compo_AddClient({
   const [selectedCity, setSelectedCity] = useState<CityInfoType>(
     {} as CityInfoType
   );
-  console.log(selectedCountry, selectedState, selectedCity);
+  const [incompleteError, setIncompleteError] = useState("");
+  const [formError, setFormError] = useState("");
+
+  console.log("country", selectedCountry.name);
   const dispatch = useDispatch<AppDispatch>();
   const [clientData, setClientData] = useState<ClientType>({
     clientName: "",
@@ -54,27 +58,84 @@ export default function Compo_AddClient({
       country: selectedCity.name,
       postalCode: "",
     },
-    sameState: false,
     user: user,
   });
+  console.log("ClientData", clientData);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  React.useEffect(() => {
     setClientData({
       ...clientData,
-      [name]: value,
+      address: {
+        ...clientData.address,
+        country: selectedCountry.name,
+        state: selectedState.name,
+        city: selectedCity.name,
+      },
+      user: user,
     });
+  }, [selectedCountry, selectedState, selectedCity]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    if (name === "gistin" || name === "pancardNo") {
+      console.log("Inside handle change", name, value);
+      setClientData({
+        ...clientData,
+        [name]: value.toLocaleUpperCase(),
+      });
+    } else {
+      setClientData({
+        ...clientData,
+        [name]: value,
+      });
+    }
+    setFormError("");
   };
 
-  const handleSubmit = () => {
-    if (clientData.address.state === "Madhya Pradesh") {
-      clientData.sameState = true;
+  function areAllFieldsFilled(obj: any) {
+    for (const key in obj) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
+        if (!areAllFieldsFilled(obj[key])) {
+          return false;
+        }
+      } else {
+        if (obj[key] === "" || obj[key] === undefined) {
+          return false;
+        }
+      }
     }
-    if (Object.values(clientData).every((val) => val !== "")) {
+    return true;
+  }
+
+  function areEntriesValid(obj: any) {
+    if (obj.contactNo.length !== 10) {
+      setFormError("Contactno. must be of 10 digit only.");
+      return false;
+    } else if (obj.gistin.length !== 15) {
+      setFormError("Gstin must be of 15 digit only.");
+      return false;
+    } else if (obj.pancardNo.length !== 10) {
+      setFormError("Pancard must be of 10 digit only.");
+      return false;
+    } else if (obj.email) {
+      const pattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      !pattern.test(obj.email)
+        ? setFormError("Invalid email address*")
+        : setFormError("");
+      return pattern.test(obj.email);
+    }
+    setFormError("");
+    return true;
+  }
+
+  const handleSubmit = () => {
+    if (areAllFieldsFilled(clientData) && areEntriesValid(clientData)) {
       dispatch(addNewClientAction(clientData));
       handleClose();
     } else {
-      alert("Please fill in all fields");
+      setIncompleteError("Incomplete fields");
     }
   };
 
@@ -84,7 +145,12 @@ export default function Compo_AddClient({
         Add Client
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Client</DialogTitle>
+        <DialogTitle>Add Client</DialogTitle>;
+        {formError.length > 0 ? (
+          <Alert severity="error"> {formError}</Alert>
+        ) : incompleteError.length > 0 ? (
+          <Alert severity="error"> {incompleteError}</Alert>
+        ) : null}
         <DialogContent>
           <TextField
             autoFocus
@@ -94,8 +160,9 @@ export default function Compo_AddClient({
             type="text"
             fullWidth
             variant="standard"
+            name="clientName"
             value={clientData.clientName}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
           />
           <TextField
@@ -105,20 +172,26 @@ export default function Compo_AddClient({
             type="email"
             fullWidth
             variant="standard"
+            name="email"
             value={clientData.email}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
           />
           <TextField
             margin="dense"
             id="contactNo"
             label="Contact Number"
-            type="text"
+            type="number"
             fullWidth
             variant="standard"
+            name="contactNo"
             value={clientData.contactNo}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
+            inputProps={{
+              pattern: "[0-9]{10}",
+              title: "Please enter valid mobile number",
+            }}
           />
           <TextField
             margin="dense"
@@ -127,8 +200,9 @@ export default function Compo_AddClient({
             type="text"
             fullWidth
             variant="standard"
+            name="pancardNo"
             value={clientData.pancardNo}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
           />
           <TextField
@@ -138,8 +212,9 @@ export default function Compo_AddClient({
             type="text"
             fullWidth
             variant="standard"
+            name="gistin"
             value={clientData.gistin}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
           />
           <TextField
@@ -149,8 +224,9 @@ export default function Compo_AddClient({
             type="number"
             fullWidth
             variant="standard"
+            name="conversionRate"
             value={clientData.conversionRate}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
             required
           />
           <TextField
@@ -160,6 +236,7 @@ export default function Compo_AddClient({
             type="text"
             fullWidth
             variant="standard"
+            name="street"
             value={clientData.address.street}
             onChange={(e) => {
               setClientData({
@@ -169,6 +246,7 @@ export default function Compo_AddClient({
             }}
             required
           />
+          <Typography className="text-xs opacity-70">Select Region</Typography>
           <SelectCountryStateCity
             selectedCountry={selectedCountry}
             selectedState={selectedState}
@@ -176,6 +254,23 @@ export default function Compo_AddClient({
             setSelectedCountry={setSelectedCountry}
             setSelectedState={setSelectedState}
             setSelectedCity={setSelectedCity}
+          />
+          <TextField
+            margin="dense"
+            id="postalCode"
+            label="Postal Code"
+            type="text"
+            fullWidth
+            variant="standard"
+            name="postalCode"
+            value={clientData.address.postalCode}
+            onChange={(e) => {
+              setClientData({
+                ...clientData,
+                address: { ...clientData.address, postalCode: e.target.value },
+              });
+            }}
+            required
           />
         </DialogContent>
         <DialogActions>

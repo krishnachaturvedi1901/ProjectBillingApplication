@@ -4,10 +4,12 @@ import { ClientType } from "../../../types/types";
 
 export const getAllClientsByAdminIdAction = createAsyncThunk(
   "allclients/getAllClientsByAdminIdStatus",
-  async (adminId: number, thunkApi) => {
+  async (adminId: string, thunkApi) => {
     try {
-      const res = await getAllClientsByAdminId(adminId);
-      console.log("res after allClients", res);
+      let res = await getAllClientsByAdminId(adminId);
+      if (res.length > 0) {
+        res = res.filter((client: ClientType) => adminId === client.user);
+      }
       return res;
     } catch (error) {
       return thunkApi.rejectWithValue(

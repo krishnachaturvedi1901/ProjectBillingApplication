@@ -3,16 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../states/redux/store";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
 import { getAdminByIdAction } from "../../../states/redux/AdminStates/adminSlice";
-import { Button, Skeleton } from "@mui/material";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import ConfirmationDialog from "./Compo-ClientDialogeBox";
 import { ClientType } from "../../../types/types";
-import Compo_Loding from "./Compo_Loding";
-import Compo_AddClient from "./Compo_AddClient";
+import CompoLoading from "./Compo-Loding";
+import CompoAddClient from "./Compo_AddClient";
 
 const SelectClient = () => {
   const { isAuth, adminId } = useContext(AuthContext);
-  const [allClients, setAllClients] = useState<ClientType[]>([]);
+  const [companyLogo, setCompanyLogo] = useState("");
   // -------------------------------------------------------
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
@@ -38,50 +37,97 @@ const SelectClient = () => {
   const selectedClient = useSelector(
     (state: RootState) => state.selectedClientState
   );
-  console.log("selectedClient-", selectedClient);
+  const addedNewClientState = useSelector(
+    (state: RootState) => state.addClientState
+  );
+  // console.log("selectedClient-", selectedClient);
+  // -------------------------------------------------------
+
   useEffect(() => {
-    // Add adminId later
-    if (isAuth) {
-      dispatch(getAdminByIdAction(2));
+    if (
+      loading === "succeeded" &&
+      adminId &&
+      adminId === "6516a4ba98fd8b5ed365d5f4"
+    ) {
+      setCompanyLogo("https://gammaedge.io/images/logo1.png");
+    } else if (loading === "succeeded" && adminId) {
+      setCompanyLogo("https://www.cubexo.io/images/Logo.webp");
+    }
+  }, [loading, data]);
+
+  useEffect(() => {
+    if (isAuth && adminId) {
+      dispatch(getAdminByIdAction(adminId));
     }
   }, [isAuth, dispatch]);
 
   useEffect(() => {
-    dispatch(getAllClientsByAdminIdAction(1));
-  }, [dispatch]);
-
-  console.log("data in client compo of admin ", loading, error, data);
-  useEffect(() => {
-    if (clients.data.length > 0) {
-      setAllClients(clients.data.filter((client) => data.id === client.user));
+    if (adminId && loading === "succeeded") {
+      let timer = setTimeout(() => {
+        dispatch(getAllClientsByAdminIdAction(adminId));
+        return () => {
+          clearTimeout(timer);
+        };
+      }, 1000);
     }
-  }, [clients, data, dispatch]);
+  }, [dispatch, loading]);
+
+  useEffect(() => {
+    if (addedNewClientState.loading === "succeeded" && adminId) {
+      dispatch(getAllClientsByAdminIdAction(adminId));
+    }
+  }, [
+    addedNewClientState.loading,
+    addedNewClientState,
+    addedNewClientState.data,
+    dispatch,
+    adminId,
+  ]);
+  useEffect(() => {
+    if ((adminId && error) || selectedClient.error) {
+      window.location.reload();
+    }
+  }, [error, selectedClient.error]);
 
   if (
     loading === "pending" ||
-    clients.loading === "pending" ||
-    selectedClient.loading === "pending"
+    // clients.loading === "pending" ||
+    selectedClient.loading === "pending" ||
+    addedNewClientState.loading === "pending"
   ) {
-    return <Compo_Loding />;
-  } else if (error || clients.error || selectedClient.error) {
-    return <h3>Error in getting admin detail, logout and login again</h3>;
+    return <CompoLoading />;
+  } else if (error || selectedClient.error) {
+    return (
+      <h3>
+        Error in getting admin detail, refresh or login again.
+        <br />
+        {"adminId--->" + adminId}
+        <br />
+        {"Admin network error-" + error}
+        <br />
+        {"All Client get req network error-" + clients.error}
+        <br />
+        {"Selected client get reqById nework error-" +
+          selectedClient.error}{" "}
+      </h3>
+    );
   }
 
-  const clientsArr: ClientType[] = allClients;
+  const clientsArr: ClientType[] = clients.data;
   const clientObj: ClientType = selectedClient.data;
 
   return (
     <section>
       <div className="flex justify-end items-center">
         <div className="bg-colorMedium rounded-lg border border-x-colorMedium w-38 h-11 flex justify-center items-center my-4 mx-4">
-          <ConfirmationDialog clientsArr={clientsArr} />
+          <ConfirmationDialog clientsArr={clientsArr} adminId={adminId} />
         </div>
         <div>
-          <Compo_AddClient
+          <CompoAddClient
             open={open}
             handleClickOpen={handleClickOpen}
             handleClose={handleClose}
-            user={data.id}
+            user={adminId!}
           />
         </div>
       </div>
@@ -91,7 +137,7 @@ const SelectClient = () => {
             <div className="text-black dark:text-colorLightFont p-4">
               <div className="bg-slate-300 h-16 w-48 p-2 mb-4 rounded-lg">
                 <img
-                  src={data.companyLogo}
+                  src={companyLogo}
                   alt="CompanyLogo"
                   className="h-10 w-auto "
                 />

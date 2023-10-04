@@ -127,6 +127,24 @@
       "user": 1,
       "conversionRate": 100,
       "sameState": false
+    },
+    {
+      "clientName": "Billing App",
+      "email": "kc@gmail.com",
+      "contactNo": "3434656765",
+      "pancardNo": "GH87897",
+      "gistin": "UJHJIHJK&*(&",
+      "conversionRate": "81",
+      "address": {
+        "street": "dfdsf",
+        "city": "Indore",
+        "state": "Madhya Pradesh",
+        "country": "India",
+        "postalCode": "482020"
+      },
+      "sameState": true,
+      "user": 2,
+      "id": 6
     }
   ],
   "projects": [
@@ -351,7 +369,11 @@
       "adminId": 1,
       "amountWithouTax": 20000,
       "amountAfterTax": 22000,
-      "projects": [1, 2, 3],
+      "projects": [
+        1,
+        2,
+        3
+      ],
       "paymentStatus": false
     }
   ]

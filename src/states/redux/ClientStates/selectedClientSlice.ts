@@ -4,7 +4,7 @@ import { ClientType } from "../../../types/types";
 
 export const getClientByIdAction = createAsyncThunk(
   "selectedClient/getClientByIdStatus",
-  async (clientId: number, thunkApi) => {
+  async (clientId: string, thunkApi) => {
     try {
       const res = await getClientByClientId(clientId);
       return res;

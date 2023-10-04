@@ -28,6 +28,17 @@ const Login = () => {
     validateTokenFunction();
   }, []);
 
+  useEffect(() => {
+    const validateTokenFunction = async () => {
+      const result = await validateToken();
+      if (result.validation && result.adminId) {
+        setIsAuth(true);
+        setAdminId(result.adminId);
+      }
+    };
+    validateTokenFunction();
+  }, [isAuth]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setAuthData({ ...authData, [name]: value });

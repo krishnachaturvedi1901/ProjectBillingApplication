@@ -1,15 +1,11 @@
 import axios from "axios";
 import config from "../config/config";
 
-export async function getAdminByAdminId(adminId: number) {
+export async function getAdminByAdminId(adminId: string) {
   try {
     const response = await axios(`${config.apiUrlAdmin}/${adminId}`);
     return response.data;
   } catch (error) {
-    console.log(
-      "Error in getting allclients :from getAllClients function-",
-      error
-    );
-    throw new Error("Error in getting allclients");
+    throw new Error("Error in getting admin");
   }
 }

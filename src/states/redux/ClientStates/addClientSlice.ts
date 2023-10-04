@@ -7,7 +7,7 @@ export const addNewClientAction = createAsyncThunk(
   async (clientData: ClientType, thunkApi) => {
     try {
       const res = await addClient(clientData);
-      return res.data;
+      return res;
     } catch (error) {
       return thunkApi.rejectWithValue(`Error in adding new client ${error}`);
     }

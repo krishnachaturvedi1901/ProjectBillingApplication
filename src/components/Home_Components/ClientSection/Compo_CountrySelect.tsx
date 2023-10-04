@@ -23,15 +23,43 @@ export default function SelectCountryStateCity({
   setSelectedState: Dispatch<SetStateAction<StateInfoType>>;
   setSelectedCity: Dispatch<SetStateAction<CityInfoType>>;
 }) {
-  useEffect(() => {
-    console.log(selectedCountry);
-    console.log(selectedCountry?.isoCode);
-    console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
-  }, [selectedCountry]);
+  // useEffect(() => {
+  //   console.log(selectedCountry);
+  //   console.log(selectedCountry?.isoCode);
+  //   console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
+  // }, [selectedCountry]);
+
+  const countriesArr: CountryInfoType[] = Country.getAllCountries().map(
+    (country) => ({
+      name: country.name,
+      isoCode: country.isoCode,
+      flag: country.flag,
+      phonecode: country.phonecode,
+      currency: country.currency,
+      latitude: country.latitude,
+      longitude: country.longitude,
+    })
+  );
+  const statesArr: StateInfoType[] = State?.getStatesOfCountry(
+    selectedCountry?.isoCode
+  ).map((state) => ({
+    name: state.name,
+    isoCode: state.isoCode,
+    countryCode: state.countryCode,
+  }));
+  const citiesArr: CityInfoType[] = City.getCitiesOfState(
+    selectedState?.countryCode,
+    selectedState?.isoCode
+  ).map((city) => ({
+    name: city.name,
+    countryCode: city.countryCode,
+    stateCode: city.stateCode,
+  }));
+
   return (
     <div className="App">
       <Select
-        options={Country.getAllCountries()}
+        options={countriesArr}
         getOptionLabel={(options) => {
           return options["name"];
         }}
@@ -40,11 +68,13 @@ export default function SelectCountryStateCity({
         }}
         value={selectedCountry}
         onChange={(item) => {
-          setSelectedCountry(item);
+          if (item) {
+            setSelectedCountry(item);
+          }
         }}
       />
       <Select
-        options={State?.getStatesOfCountry(selectedCountry?.isoCode)}
+        options={statesArr}
         getOptionLabel={(options) => {
           return options["name"];
         }}
@@ -53,14 +83,13 @@ export default function SelectCountryStateCity({
         }}
         value={selectedState}
         onChange={(item) => {
-          setSelectedState(item);
+          if (item) {
+            setSelectedState(item);
+          }
         }}
       />
       <Select
-        options={City.getCitiesOfState(
-          selectedState?.countryCode,
-          selectedState?.isoCode
-        )}
+        options={citiesArr}
         getOptionLabel={(options) => {
           return options["name"];
         }}
@@ -69,7 +98,7 @@ export default function SelectCountryStateCity({
         }}
         value={selectedCity}
         onChange={(item) => {
-          setSelectedCity(item);
+          if (item) setSelectedCity(item);
         }}
       />
     </div>

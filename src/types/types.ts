@@ -1,5 +1,5 @@
 export interface AdminType {
-  id: number;
+  _id?: string;
   companyName: string;
   companyLogo: string;
   email: string;
@@ -17,7 +17,7 @@ export interface AdminType {
   invoiceNo: number;
 }
 export interface ClientType {
-  id?: number;
+  _id?: string;
   clientName: string;
   email: string;
   contactNo: string;
@@ -30,9 +30,9 @@ export interface ClientType {
     postalCode: string;
   };
   gistin: string;
-  user: number;
+  user: string;
   conversionRate: number;
-  sameState: boolean;
+  sameState?: boolean;
 }
 export interface ProjectType {
   id: number;
@@ -76,19 +76,19 @@ export type CountryInfoType = {
   currency: string;
   latitude: string;
   longitude: string;
-  timezones: [];
+  timezones?: [] | undefined;
 };
 export type StateInfoType = {
   name: string;
   isoCode: string;
   countryCode: string;
-  latitude: string;
-  longitude: string;
+  latitude?: string;
+  longitude?: string;
 };
 export type CityInfoType = {
   name: string;
   countryCode: string;
   stateCode: string;
-  latitude: string;
-  longitude: string;
+  latitude?: string;
+  longitude?: string;
 };

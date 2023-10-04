@@ -16,11 +16,12 @@ import { ClientType } from "../../../types/types";
 import { useDispatch } from "react-redux";
 import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
 import { AppDispatch } from "../../../states/redux/store";
+import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 
 function ConfirmationDialogRaw(props: {
-  onClose: (newValue: number) => void;
+  onClose: (newValue: string) => void;
   open: boolean;
-  value: number;
+  value: string;
   id: string; // Add the id prop here
   keepMounted: boolean;
   clients: ClientType[];
@@ -41,7 +42,7 @@ function ConfirmationDialogRaw(props: {
   };
 
   const handleCancel = () => {
-    onClose(0);
+    onClose("");
   };
 
   const handleOk = () => {
@@ -49,7 +50,7 @@ function ConfirmationDialogRaw(props: {
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(+event.target.value);
+    setValue(event.target.value);
   };
 
   return (
@@ -71,8 +72,8 @@ function ConfirmationDialogRaw(props: {
         >
           {clients.map((client) => (
             <FormControlLabel
-              value={client.id}
-              key={client.id}
+              value={client._id}
+              key={client._id}
               control={<Radio />}
               label={client.clientName}
             />
@@ -97,24 +98,31 @@ ConfirmationDialogRaw.propTypes = {
 
 export default function ConfirmationDialog({
   clientsArr,
+  adminId,
 }: {
   clientsArr: ClientType[];
+  adminId: string | null;
 }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<number>(0);
+  const [value, setValue] = React.useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
-
   React.useEffect(() => {
-    if (value > 0) {
+    if (value.length > 0) {
       dispatch(getClientByIdAction(value));
     }
   }, [value, dispatch]);
+
+  React.useEffect(() => {
+    if (adminId && clientsArr.length === 0) {
+      dispatch(getAllClientsByAdminIdAction(adminId));
+    }
+  }, [adminId, dispatch]);
 
   const handleClickListItem = () => {
     setOpen(true);
   };
 
-  const handleClose = (newValue: number) => {
+  const handleClose = (newValue: string) => {
     setOpen(false);
 
     if (newValue) {
