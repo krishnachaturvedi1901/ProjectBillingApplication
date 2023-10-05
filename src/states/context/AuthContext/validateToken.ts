@@ -3,6 +3,7 @@ import { DecodedTokenDataType } from "../../../types/types";
 
 export const validateToken = () => {
   const token = localStorage.getItem("billAppAuthToken");
+  
   try {
     if (token) {
       const decodedData: DecodedTokenDataType | null = jwt_decode(token);

@@ -26,7 +26,7 @@ const adminInitialState: AdminInitialStateType = {
   error: null,
 };
 
-export const createAdminSlice = createSlice({
+const createAdminSlice = createSlice({
   name: "admin",
   initialState: adminInitialState,
   reducers: {},

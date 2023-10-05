@@ -92,6 +92,7 @@ export default function CompoAddClient({
       });
     }
     setFormError("");
+    setIncompleteError("");
   };
 
   function areAllFieldsFilled(obj: any) {

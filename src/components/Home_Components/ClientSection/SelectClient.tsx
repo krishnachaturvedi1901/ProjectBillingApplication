@@ -12,12 +12,7 @@ import CompoAddClient from "./Compo_AddClient";
 const SelectClient = () => {
   const { isAuth, adminId } = useContext(AuthContext);
   const [companyLogo, setCompanyLogo] = useState("");
-  // -------------------------------------------------------
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [selectedState, setSelectedState] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
-
-  //--------------------------------------------------------
+  //-------------------------------------------------------- 
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -53,13 +48,13 @@ const SelectClient = () => {
     } else if (loading === "succeeded" && adminId) {
       setCompanyLogo("https://www.cubexo.io/images/Logo.webp");
     }
-  }, [loading, data]);
+  }, [loading, data, adminId]);
 
   useEffect(() => {
     if (isAuth && adminId) {
       dispatch(getAdminByIdAction(adminId));
     }
-  }, [isAuth, dispatch]);
+  }, [isAuth, adminId, dispatch]);
 
   useEffect(() => {
     if (adminId && loading === "succeeded") {
@@ -70,7 +65,7 @@ const SelectClient = () => {
         };
       }, 1000);
     }
-  }, [dispatch, loading]);
+  }, [dispatch, adminId, loading]);
 
   useEffect(() => {
     if (addedNewClientState.loading === "succeeded" && adminId) {
@@ -87,7 +82,7 @@ const SelectClient = () => {
     if ((adminId && error) || selectedClient.error) {
       window.location.reload();
     }
-  }, [error, selectedClient.error]);
+  }, [error, adminId, selectedClient.error]);
 
   if (
     loading === "pending" ||
