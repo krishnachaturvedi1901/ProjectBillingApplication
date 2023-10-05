@@ -4,88 +4,12 @@ import React from "react";
 const CompoLoading = () => {
   return (
     <div className="flex justify-between items-center p-8">
-      <div>
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7, mb: "10px" }}
-          variant="rectangular"
-          width={150}
-          height={50}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-      </div>
-      <div>
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7, mb: "10px" }}
-          variant="rectangular"
-          width={150}
-          height={50}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-        <Skeleton
-          sx={{ bgcolor: "grey.700", opacity: 0.7 }}
-          variant="text"
-          width={220}
-          height={20}
-        />
-      </div>
+      <Skeleton
+        className=" bg-gray-300 bg-opacity-50 min-w-full"
+        variant="rectangular"
+        width={700}
+        height={300}
+      ></Skeleton>
     </div>
   );
 };

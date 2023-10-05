@@ -4,15 +4,16 @@ import CompoAddProject from "./CompoAddProject";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../states/redux/store";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
+import { useFetchAllProjectsByClientId } from "../../../states/query/Project_queries/projectQueries";
+import CompoLoadingProjects from "./CompoLoadingProjects";
+import { Alert } from "@mui/material";
 
 const ProjectTable = () => {
   // ---------------------------------------------------
   const [open, setOpen] = React.useState(false);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -21,7 +22,60 @@ const ProjectTable = () => {
   const selectedClientState = useSelector(
     (state: RootState) => state.selectedClientState
   );
-
+  const { isLoading, data, isError } = useFetchAllProjectsByClientId(
+    selectedClientState.data._id
+  );
+  console.log(isLoading, data, isError, "->", selectedClientState.data._id);
+  if (isLoading) {
+    return (
+      <>
+        <div>
+          <CompoAddProject
+            open={open}
+            handleClickOpen={handleClickOpen}
+            handleClose={handleClose}
+            clientId={selectedClientState.data._id}
+            adminId={adminId}
+            forAddProject={true}
+          />
+        </div>
+        <div className="text-xl font-bold text-center p-4 ">
+          <h3>PROJECT DETAILS</h3>
+          <p className="text-lg text-purple-500 font-thin dark:text-purple-300 p-4 ">
+            {!selectedClientState.data._id
+              ? "Please select client to display projects or to add project !!"
+              : null}
+          </p>
+        </div>
+        <CompoLoadingProjects />;
+      </>
+    );
+  }
+  if (data === "" && data.length === 0) {
+    return (
+      <div>
+        <div>
+          <CompoAddProject
+            open={open}
+            handleClickOpen={handleClickOpen}
+            handleClose={handleClose}
+            clientId={selectedClientState.data._id}
+            adminId={adminId}
+            forAddProject={true}
+          />
+        </div>
+        <div className="text-xl font-bold text-center p-4 ">
+          <h3>PROJECT DETAILS</h3>
+          <p className="text-lg text-purple-500 font-thin dark:text-purple-300 p-4 ">
+            Selected Client has no project available !
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (isError) {
+    return <Alert severity="error">Network request error, refresh!!!</Alert>;
+  }
   return (
     <section>
       <div>
@@ -36,7 +90,9 @@ const ProjectTable = () => {
       </div>
       <div>
         <table>
-          <caption>Statement Summary</caption>
+          <caption className="text-xl font-bold text-center p-4 ">
+            PROJECT DETAILS
+          </caption>
           <thead>
             <tr>
               <th>Project</th>

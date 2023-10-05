@@ -9,22 +9,23 @@ import {
 import { ProjectType, UpdateProjectDataType } from "../../../types/types";
 import { queryClient } from "../../..";
 
-export const useFetchAllProjects = (clientId: string) => {
-  return useQuery(["projects"], () => getAllProjectsByClientId(clientId));
+export const useFetchAllProjectsByClientId = (clientId: string | undefined) => {
+  return useQuery(
+    ["projects", clientId],
+    () => (clientId ? getAllProjectsByClientId(clientId) : null),
+    {
+      enabled: !!clientId,
+    }
+  );
 };
 
-export const useFetchProjectById = (projectId: string) => {
+export const useFetchProjectByProjectId = (projectId: string) => {
   return useQuery(["project", { projectId }], () => getProjectById(projectId));
 };
 
 export const useAddNewProject = () => {
-  const AddProjectMutationHandler = useMutation(
-    (projectData: ProjectType) => addProject(projectData),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["projects"]);
-      },
-    }
+  const AddProjectMutationHandler = useMutation((projectData: ProjectType) =>
+    addProject(projectData)
   );
   return AddProjectMutationHandler;
 };

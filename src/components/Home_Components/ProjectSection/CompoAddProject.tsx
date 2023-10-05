@@ -7,19 +7,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../states/redux/store";
-import {
-  Alert,
-  FormControl,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Typography,
-} from "@mui/material";
+import { Alert, LinearProgress, MenuItem } from "@mui/material";
 import { ProjectType } from "../../../types/types";
+import { useAddNewProject } from "../../../states/query/Project_queries/projectQueries";
+import { queryClient } from "../../..";
 
 export default function CompoAddProject({
   open,
@@ -37,20 +28,22 @@ export default function CompoAddProject({
   forAddProject: boolean;
   projectId?: string | undefined;
 }) {
+  const [workPeriodType, setWorkPeriodType] = useState("hours");
+  const [currencyType, setCurrencyType] = useState("rupees");
+  const [loading, setLoading] = useState(false);
   const [incompleteError, setIncompleteError] = useState("");
   const [formError, setFormError] = useState("");
 
-  const dispatch = useDispatch<AppDispatch>();
   const [projectData, setProjectData] = useState<ProjectType>({
     projectName: "",
     projectManager: "",
     periodFrom: "",
     periodTo: "",
-    rate: 0,
-    workingPeriod: 0,
+    rate: 1,
+    workingPeriod: 1,
     workingPeriodType: "hours",
     currencyType: "rupees",
-    conversionRate: 83.25,
+    conversionRate: 1,
     paymentStatus: false,
     adminId: "",
     clientId: "",
@@ -58,23 +51,46 @@ export default function CompoAddProject({
   });
   console.log("projectData", projectData);
 
+  React.useEffect(() => {
+    if (clientId && adminId) {
+      setProjectData({ ...projectData, clientId, adminId });
+    }
+  }, [clientId, adminId]);
+
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void {
-    const { name, value } = e.target;
-    setProjectData({ ...projectData, [name]: value });
+    let { name, value } = e.target;
+    if (name === "rate" || name === "workingPeriod") {
+      let numVal = +value;
+      setProjectData((prevData) => ({
+        ...prevData,
+        [name]: numVal,
+      }));
+    } else {
+      setProjectData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+    if (name === "workingPeriodType") {
+      setWorkPeriodType(value);
+    }
+    if (name === "currencyType" && value === "rupees") {
+      setProjectData((prevData) => ({
+        ...prevData,
+        conversionRate: 1,
+      }));
 
+      setCurrencyType(value);
+    } else if (name === "currencyType" && value === "dollars") {
+      setProjectData((prevData) => ({
+        ...prevData,
+        conversionRate: 83.25,
+      }));
+    }
     setFormError("");
-  }
-
-  function handleSelectElementChange(
-    e:
-      | SelectChangeEvent<"rupees" | "dollars">
-      | SelectChangeEvent<"hours" | "months">
-  ) {
-    console.log("e of rupee hour change------>", e.target.name, e.target.value);
-    const { name, value } = e.target;
-    setProjectData({ ...projectData, [name]: value });
+    setIncompleteError("");
   }
 
   function areAllFieldsFilled(obj: any) {
@@ -113,23 +129,40 @@ export default function CompoAddProject({
     return true;
   }
 
+  const addProjectMutation = useAddNewProject();
+
   const handleSubmit = (
     e:
       | React.FormEvent<HTMLFormElement>
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if (areAllFieldsFilled(projectData) && areEntriesValid(projectData)) {
-      handleClose();
-    } else {
-      setIncompleteError("Incomplete fields");
-    }
+    setLoading(true);
+    addProjectMutation.mutate(projectData, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["projects", clientId]);
+        queryClient.refetchQueries(["projects", clientId]);
+        setLoading(false);
+        handleClose();
+      },
+      onError(error) {
+        setLoading(false);
+        setIncompleteError("Add request error, add again.");
+      },
+    });
+
+    // if (areAllFieldsFilled(projectData) && areEntriesValid(projectData)) {
+    //   handleClose();
+    // } else {
+    //   setIncompleteError("Incomplete fields");
+    // }
   };
 
   return (
     <>
       <div className="flex w-screen justify-end pr-12 pt-4">
         <Button
+          disabled={!clientId || !adminId}
           variant="contained"
           sx={{
             backgroundColor: "darkorchid",
@@ -150,110 +183,127 @@ export default function CompoAddProject({
           ) : incompleteError.length > 0 ? (
             <Alert severity="error"> {incompleteError}</Alert>
           ) : null}
+          {loading ? <LinearProgress /> : null}
           <DialogContent>
-            <form onSubmit={(e) => handleSubmit(e)}>
-              <FormControl>
-                <Input
-                  id="projectName"
-                  name="projectName"
-                  placeholder="Project Name"
-                  required
-                  value={projectData.projectName}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
-              <FormControl>
-                <Input
-                  id="projectManager"
-                  name="projectManager"
-                  placeholder="Project Manager"
-                  value={projectData.projectManager}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
-              <FormControl>
-                <label>Project start from:</label>
-                <Input
-                  id="periodFrom"
-                  name="periodFrom"
-                  placeholder="Project start from"
-                  type="date"
-                  required
-                  value={projectData.periodFrom}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
-              <FormControl>
-                <label>Project end at:</label>
-                <Input
-                  id="periodTo"
-                  name="periodTo"
-                  placeholder="Project End At"
-                  type="date"
-                  required
-                  value={projectData.periodTo}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
+            <form onSubmit={handleSubmit}>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="projectName"
+                label="Project Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                name="projectName"
+                value={projectData.projectName}
+                onChange={handleChange}
+                required
+              />
 
-              <div>
-                <FormControl>
-                  <Input
-                    placeholder="Rate"
-                    id="rate"
-                    name="rate"
-                    type="number"
-                    value={projectData.rate}
-                    onChange={handleChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Select
-                    placeholder="Select currency type"
-                    id="currencyType"
-                    name="currencyType"
-                    value={projectData.currencyType || ""}
-                    onChange={handleSelectElementChange}
-                  >
-                    <MenuItem value="rupees">Rupees</MenuItem>
-                    <MenuItem value="dollars">Dollars</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <Select
-                    placeholder="Work period type"
-                    id="workingPeriodType"
-                    name="workingPeriodType"
-                    value={projectData.workingPeriodType || ""}
-                    onChange={handleSelectElementChange}
-                  >
-                    <MenuItem value="hours">Hours</MenuItem>
-                    <MenuItem value="months">Months</MenuItem>
-                  </Select>{" "}
-                </FormControl>
+              <TextField
+                margin="dense"
+                id="projectManager"
+                label="Project Manager"
+                type="text"
+                fullWidth
+                variant="standard"
+                name="projectManager"
+                value={projectData.projectManager}
+                onChange={handleChange}
+              />
+              <label className=" text-[12px] text-sky-700">Period from*</label>
+              <TextField
+                margin="dense"
+                id="periodFrom"
+                type="date"
+                fullWidth
+                variant="standard"
+                name="periodFrom"
+                value={projectData.periodFrom}
+                onChange={handleChange}
+                required
+              />
+              <label className=" text-[12px] text-sky-700">Period to*</label>
+              <TextField
+                margin="dense"
+                id="periodTo"
+                type="date"
+                fullWidth
+                variant="standard"
+                name="periodTo"
+                value={projectData.periodTo}
+                onChange={handleChange}
+                required
+              />
+
+              <TextField
+                margin="dense"
+                id="rate"
+                label={`Rate (${currencyType}/${workPeriodType})`}
+                type="number"
+                fullWidth
+                variant="standard"
+                name="rate"
+                value={projectData.rate}
+                onChange={handleChange}
+              />
+              <div className="flex ">
+                <TextField
+                  select
+                  margin="dense"
+                  id="currencyType"
+                  label="Rate/Currency type"
+                  fullWidth
+                  variant="standard"
+                  name="currencyType"
+                  value={projectData.currencyType || ""}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="rupees">&#x20B9; (rupee)</MenuItem>
+                  <MenuItem value="dollars">$ (dollar)</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  margin="dense"
+                  id="workingPeriodType"
+                  label="Rate/Work based on"
+                  fullWidth
+                  variant="standard"
+                  name="workingPeriodType"
+                  value={projectData.workingPeriodType || ""}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="hours">Hours</MenuItem>
+                  <MenuItem value="months">Months</MenuItem>
+                </TextField>
               </div>
-              <FormControl>
-                <Input
-                  id="workingPeriod"
-                  name="workingPeriod"
-                  placeholder="Working period"
-                  type="number"
-                  value={projectData.workingPeriod}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
-              <FormControl>
-                <label>Conversion rate *</label>
-                <Input
-                  id="conversionRate"
-                  name="conversionRate"
-                  placeholder="Conversion rate *"
-                  type="number"
-                  required
-                  value={projectData.conversionRate}
-                  onChange={handleChange}
-                />{" "}
-              </FormControl>
+              <TextField
+                margin="dense"
+                id="workingPeriod"
+                label={`Project time taken in ${workPeriodType}`}
+                type="number"
+                fullWidth
+                variant="standard"
+                name="workingPeriod"
+                value={projectData.workingPeriod}
+                onChange={handleChange}
+              />
+              <label className=" text-[12px] text-sky-700">
+                Conversion rate*
+              </label>
+
+              <TextField
+                margin="dense"
+                id="conversionRate"
+                type="number"
+                fullWidth
+                variant="standard"
+                name="conversionRate"
+                value={projectData.conversionRate}
+                onChange={handleChange}
+                required
+              />
             </form>
           </DialogContent>
           <DialogActions>

@@ -7,13 +7,16 @@ export async function getAllProjectsByClientId(clientId: string) {
   if (token) {
     token = token.substring(1, token.length - 1);
   }
-
   try {
     const response = await axios(`${config.apiUrlProject}/${clientId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(
+      "================res after getAllProjectByClients================>",
+      response
+    );
     return response.data;
   } catch (error) {
     console.log(

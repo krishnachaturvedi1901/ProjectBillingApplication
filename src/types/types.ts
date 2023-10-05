@@ -40,7 +40,7 @@ export interface ProjectType {
   projectManager?: string;
   periodFrom: string;
   periodTo: string;
-  rate?: number | null;
+  rate?: number;
   workingPeriod?: number | null;
   workingPeriodType: "hours" | "months";
   currencyType: "rupees" | "dollars";

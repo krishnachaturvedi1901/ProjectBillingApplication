@@ -10,7 +10,7 @@ const Home = () => {
   // const { windowWidth } = useContext(WindowWidthContext);
 
   return (
-    <main className=" bg-slate-100 dark:bg-slate-500 h-screen text-colorDarkFont dark:text-colorLightFont ">
+    <main className=" bg-slate-100 dark:bg-slate-600 h-screen text-colorDarkFont dark:text-colorLightFont ">
       <SelectClient />
       <ProjectTable />
       <BillAmount />
