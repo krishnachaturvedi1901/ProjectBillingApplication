@@ -113,7 +113,7 @@ const SelectClient = () => {
 
   return (
     <section>
-      <div className="flex justify-around sm:justify-end items-center pr-4 sm:pr-8 sticky top-16 bg-slate-100 dark:bg-slate-600 z-10 ">
+      <div className="flex justify-around sm:justify-end items-center pr-4 sm:pr-8 sticky top-16 bg-slate-200 dark:bg-slate-600 z-10 ">
         <div>
           <ConfirmationDialog clientsArr={clientsArr} adminId={adminId} />
         </div>

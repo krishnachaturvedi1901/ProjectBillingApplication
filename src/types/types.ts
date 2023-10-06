@@ -35,17 +35,31 @@ export interface ClientType {
   sameState?: boolean;
 }
 export interface ProjectType {
-  _id?: number;
+  _id?: string;
   projectName: string;
   projectManager?: string;
-  periodFrom: string;
-  periodTo: string;
-  rate?: number;
-  workingPeriod?: number | null;
-  workingPeriodType: "hours" | "months";
-  currencyType: "rupees" | "dollars";
+  rate?: number | null;
+  projectPeriod?: number;
+  workingPeriod?: string | null;
+  workingPeriodType: "hours" | "days";
+  currencyType: "rupees" | "dollars" | "pounds";
   conversionRate: number;
   paymentStatus: boolean;
+  adminId: string;
+  clientId: string;
+  amount?: number | null;
+}
+export interface UpdateProjectDataType {
+  _id: string;
+  projectName?: string;
+  projectManager?: string;
+  rate?: number;
+  projectPeriod?: number;
+  workingPeriod?: string | null;
+  workingPeriodType?: "hours" | "months";
+  currencyType?: "rupees" | "dollars" | "pounds";
+  conversionRate?: number;
+  paymentStatus?: boolean;
   adminId: string;
   clientId: string;
   amount?: number | null;
@@ -94,15 +108,3 @@ export type CityInfoType = {
   latitude?: string;
   longitude?: string;
 };
-export interface UpdateProjectDataType {
-  projectName?: string;
-  projectManager?: string;
-  periodFrom?: string;
-  periodTo?: string;
-  ratePerHour?: number;
-  workingHours?: number;
-  isDollar?: boolean;
-  conversionRate?: number;
-  paymentStatus?: boolean;
-  amount?: number;
-}

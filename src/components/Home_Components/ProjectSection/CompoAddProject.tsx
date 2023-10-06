@@ -8,9 +8,14 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { Alert, LinearProgress, MenuItem } from "@mui/material";
-import { ProjectType } from "../../../types/types";
-import { useAddNewProject } from "../../../states/query/Project_queries/projectQueries";
+import { ProjectType, UpdateProjectDataType } from "../../../types/types";
+import {
+  useAddNewProject,
+  useUpdateProject,
+} from "../../../states/query/Project_queries/projectQueries";
 import { queryClient } from "../../..";
+import { CiEdit } from "react-icons/ci";
+import { useSnackbar } from "notistack";
 
 export default function CompoAddProject({
   open,
@@ -19,6 +24,10 @@ export default function CompoAddProject({
   adminId,
   clientId,
   forAddProject,
+  projectToEdit,
+  toEdit,
+  handleToAddClick,
+  handleToEditClick,
 }: {
   open: boolean;
   handleClickOpen: () => void;
@@ -27,46 +36,81 @@ export default function CompoAddProject({
   adminId: string | null;
   forAddProject: boolean;
   projectId?: string | undefined;
+  projectToEdit?: ProjectType;
+  toEdit: boolean | undefined;
+  handleToAddClick: () => void;
+  handleToEditClick: () => void;
 }) {
+  const { enqueueSnackbar } = useSnackbar();
   const [workPeriodType, setWorkPeriodType] = useState("hours");
   const [currencyType, setCurrencyType] = useState("rupees");
   const [loading, setLoading] = useState(false);
   const [incompleteError, setIncompleteError] = useState("");
   const [formError, setFormError] = useState("");
-
   const [projectData, setProjectData] = useState<ProjectType>({
     projectName: "",
     projectManager: "",
-    periodFrom: "",
-    periodTo: "",
-    rate: 1,
-    workingPeriod: 1,
+    rate: 0,
+    projectPeriod: 0,
+    workingPeriod: "00:00",
     workingPeriodType: "hours",
     currencyType: "rupees",
     conversionRate: 1,
     paymentStatus: false,
     adminId: "",
     clientId: "",
-    amount: null,
   });
   console.log("projectData", projectData);
-
-  React.useEffect(() => {
-    if (clientId && adminId) {
-      setProjectData({ ...projectData, clientId, adminId });
-    }
-  }, [clientId, adminId]);
+  console.log(
+    "outside useEffect------------------------------>",
+    adminId,
+    clientId
+  );
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void {
     let { name, value } = e.target;
-    if (name === "rate" || name === "workingPeriod") {
+    setFormError("");
+    setIncompleteError("");
+    if (
+      name === "workingPeriod" &&
+      workPeriodType === "days" &&
+      parseInt(value) < 0
+    ) {
+      value = "0";
+      console.log("in work Field negative--->", value);
+    }
+    if (name === "rate" || name === "conversionRate") {
       let numVal = +value;
+      if (numVal < 0) numVal = 1;
       setProjectData((prevData) => ({
         ...prevData,
         [name]: numVal,
       }));
+      return;
+    }
+    if (name === "currencyType" && value === "rupees") {
+      setProjectData((prevData) => ({
+        ...prevData,
+        currencyType: "rupees",
+        conversionRate: 1,
+      }));
+      setCurrencyType(value);
+    } else if (name === "currencyType" && value === "dollars") {
+      setProjectData((prevData) => ({
+        ...prevData,
+        currencyType: "dollars",
+        conversionRate: 83.25,
+      }));
+      setCurrencyType(value);
+    } else if (name === "currencyType" && value === "pounds") {
+      setProjectData((prevData) => ({
+        ...prevData,
+        currencyType: "pounds",
+        conversionRate: 101.35,
+      }));
+      setCurrencyType(value);
     } else {
       setProjectData((prevData) => ({
         ...prevData,
@@ -76,116 +120,192 @@ export default function CompoAddProject({
     if (name === "workingPeriodType") {
       setWorkPeriodType(value);
     }
-    if (name === "currencyType" && value === "rupees") {
-      setProjectData((prevData) => ({
-        ...prevData,
-        conversionRate: 1,
-      }));
-
-      setCurrencyType(value);
-    } else if (name === "currencyType" && value === "dollars") {
-      setProjectData((prevData) => ({
-        ...prevData,
-        conversionRate: 83.25,
-      }));
-    }
-    setFormError("");
-    setIncompleteError("");
   }
 
-  function areAllFieldsFilled(obj: any) {
-    for (const key in obj) {
-      if (typeof obj[key] === "object" && obj[key] !== null) {
-        if (!areAllFieldsFilled(obj[key])) {
-          return false;
-        }
-      } else {
-        if (obj[key] === "" || obj[key] === undefined) {
-          return false;
-        }
-      }
+  function areAllRequiredFieldsFilled(obj: any) {
+    if (obj.projectName === "") {
+      setFormError("Project name compulsary*");
+      return false;
     }
-    return true;
-  }
-
-  function areEntriesValid(obj: any) {
-    if (obj.contactNo.length !== 10) {
-      setFormError("Contactno. must be of 10 digit only.");
-      return false;
-    } else if (obj.gistin.length !== 15) {
-      setFormError("Gstin must be of 15 digit only.");
-      return false;
-    } else if (obj.pancardNo.length !== 10) {
-      setFormError("Pancard must be of 10 digit only.");
-      return false;
-    } else if (obj.email) {
-      const pattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      !pattern.test(obj.email)
-        ? setFormError("Invalid email address*")
-        : setFormError("");
-      return pattern.test(obj.email);
+    if (obj.conversionRate === "") {
+      setProjectData({ ...obj, conversionRate: 1 });
     }
-    setFormError("");
+    if (obj.clientId === "" || obj.adminId === "") {
+      setFormError("ClientId and AdminId compulsary. Refresh and try again !!");
+      return false;
+    }
     return true;
   }
 
   const addProjectMutation = useAddNewProject();
 
-  const handleSubmit = (
+  const handleAddSubmit = (
     e:
       | React.FormEvent<HTMLFormElement>
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setLoading(true);
-    addProjectMutation.mutate(projectData, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["projects", clientId]);
-        queryClient.refetchQueries(["projects", clientId]);
-        setLoading(false);
-        handleClose();
-      },
-      onError(error) {
-        setLoading(false);
-        setIncompleteError("Add request error, add again.");
-      },
-    });
 
-    // if (areAllFieldsFilled(projectData) && areEntriesValid(projectData)) {
-    //   handleClose();
-    // } else {
-    //   setIncompleteError("Incomplete fields");
-    // }
+    if (areAllRequiredFieldsFilled(projectData)) {
+      setLoading(true);
+      addProjectMutation.mutate(projectData, {
+        onSuccess: () => {
+          queryClient.invalidateQueries(["projects", clientId]);
+          queryClient.refetchQueries(["projects", clientId]);
+          setLoading(false);
+          handleClose();
+        },
+        onError(error) {
+          setLoading(false);
+          setIncompleteError("Add request error, add again.");
+        },
+      });
+    } else {
+      setIncompleteError("Incomplete fields");
+    }
   };
+
+  const UpdateProjectMutationHandler = useUpdateProject(
+    projectData._id,
+    projectData.clientId
+  );
+
+  const handleEditSubmit = (
+    e:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    if (areAllRequiredFieldsFilled(projectData)) {
+      setLoading(true);
+      UpdateProjectMutationHandler.mutate(
+        {
+          projectId: projectData._id!,
+          updatedProjectData: projectData as UpdateProjectDataType,
+        },
+        {
+          onSuccess: () => {
+            queryClient.refetchQueries(["projects", clientId]);
+            setLoading(false);
+            enqueueSnackbar("Project deleted successfully.", {
+              variant: "success",
+            });
+
+            handleClose();
+          },
+          onError(error) {
+            setLoading(false);
+            enqueueSnackbar("Error in updating project. Try again! ", {
+              variant: "error",
+            });
+            setIncompleteError("Add request error, add again.");
+          },
+        }
+      );
+    } else {
+      setIncompleteError("Incomplete fields");
+    }
+  };
+
+  React.useEffect(() => {
+    if (toEdit && projectToEdit) {
+      setProjectData(projectToEdit);
+    } else if (!toEdit) {
+      setProjectData({
+        projectName: "",
+        projectManager: "",
+        rate: 0,
+        projectPeriod: 0,
+        workingPeriod: "00:00",
+        workingPeriodType: "hours",
+        currencyType: "rupees",
+        conversionRate: 1,
+        paymentStatus: false,
+        adminId: adminId ? adminId : "",
+        clientId: clientId ? clientId : "",
+      });
+    }
+  }, [toEdit, forAddProject, projectToEdit]);
+
+  React.useEffect(() => {
+    if (clientId) {
+      setProjectData({ ...projectData, clientId });
+    }
+    if (adminId) {
+      setProjectData({ ...projectData, adminId });
+    }
+  }, [clientId, adminId]);
+
+  const handleAddProjectClick = () => {
+    console.log("handleAddProject Called================>");
+    handleToAddClick();
+    handleClickOpen();
+  };
+  const handleEditProjectClick = () => {
+    console.log("handleEditProject Called==============>");
+
+    handleToEditClick();
+    handleClickOpen();
+  };
+
+  console.log(
+    "toEdit",
+    toEdit,
+    "Edit will render------------------------------------>",
+    forAddProject,
+    "Projectto edit obj",
+    projectToEdit,
+    "alreasy project available-",
+    projectData
+  );
 
   return (
     <>
       <div className="flex w-screen justify-end pr-12 pt-4">
-        <Button
-          disabled={!clientId || !adminId}
-          variant="contained"
-          sx={{
-            backgroundColor: "darkorchid",
-            ":hover": {
-              backgroundColor: "#7f05bc",
-            },
-          }}
-          onClick={handleClickOpen}
-        >
-          Add Project
-        </Button>
+        {forAddProject ? (
+          <Button
+            disabled={!clientId || !adminId}
+            variant="contained"
+            sx={{
+              backgroundColor: "darkorchid",
+              ":hover": {
+                backgroundColor: "#7f05bc",
+              },
+              cursor: "pointer",
+            }}
+            onClick={() => handleAddProjectClick()}
+          >
+            Add Project
+          </Button>
+        ) : (
+          <Button
+            disabled={!clientId || !adminId}
+            variant="contained"
+            sx={{
+              backgroundColor: "darkorchid",
+              ":hover": {
+                backgroundColor: "#7f05bc",
+              },
+              cursor: "pointer",
+            }}
+            onClick={() => handleEditProjectClick()}
+          >
+            Edit
+          </Button>
+        )}
       </div>
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Add Project</DialogTitle>;
+          {incompleteError.length > 0 ? (
+            <Alert severity="error"> {incompleteError}</Alert>
+          ) : null}
           {formError.length > 0 ? (
             <Alert severity="error"> {formError}</Alert>
-          ) : incompleteError.length > 0 ? (
-            <Alert severity="error"> {incompleteError}</Alert>
           ) : null}
           {loading ? <LinearProgress /> : null}
           <DialogContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleAddSubmit}>
               <TextField
                 autoFocus
                 margin="dense"
@@ -211,40 +331,17 @@ export default function CompoAddProject({
                 value={projectData.projectManager}
                 onChange={handleChange}
               />
-              <label className=" text-[12px] text-sky-700">Period from*</label>
-              <TextField
-                margin="dense"
-                id="periodFrom"
-                type="date"
-                fullWidth
-                variant="standard"
-                name="periodFrom"
-                value={projectData.periodFrom}
-                onChange={handleChange}
-                required
-              />
-              <label className=" text-[12px] text-sky-700">Period to*</label>
-              <TextField
-                margin="dense"
-                id="periodTo"
-                type="date"
-                fullWidth
-                variant="standard"
-                name="periodTo"
-                value={projectData.periodTo}
-                onChange={handleChange}
-                required
-              />
-
               <TextField
                 margin="dense"
                 id="rate"
-                label={`Rate (${currencyType}/${workPeriodType})`}
+                label={`Rate (${currencyType}/${
+                  workPeriodType === "days" ? "months" : "hours"
+                })`}
                 type="number"
                 fullWidth
                 variant="standard"
                 name="rate"
-                value={projectData.rate}
+                value={projectData.rate === 0 ? "" : projectData.rate}
                 onChange={handleChange}
               />
               <div className="flex ">
@@ -261,6 +358,7 @@ export default function CompoAddProject({
                 >
                   <MenuItem value="rupees">&#x20B9; (rupee)</MenuItem>
                   <MenuItem value="dollars">$ (dollar)</MenuItem>
+                  <MenuItem value="pounds">&#163; (pounds)</MenuItem>
                 </TextField>
 
                 <TextField
@@ -275,24 +373,64 @@ export default function CompoAddProject({
                   onChange={handleChange}
                 >
                   <MenuItem value="hours">Hours</MenuItem>
-                  <MenuItem value="months">Months</MenuItem>
+                  <MenuItem value="days">Months</MenuItem>
                 </TextField>
               </div>
-              <TextField
-                margin="dense"
-                id="workingPeriod"
-                label={`Project time taken in ${workPeriodType}`}
-                type="number"
-                fullWidth
-                variant="standard"
-                name="workingPeriod"
-                value={projectData.workingPeriod}
-                onChange={handleChange}
-              />
+              {workPeriodType === "hours" ? (
+                <>
+                  <label className=" text-[12px] text-sky-700">
+                    {`Actual working in ${workPeriodType}`}
+                  </label>
+
+                  <TextField
+                    margin="dense"
+                    id="periodFrom"
+                    type="time" // Set the type to "time" for HH:MM input
+                    fullWidth
+                    variant="standard"
+                    name="workingPeriod"
+                    value={projectData.workingPeriod}
+                    onChange={handleChange}
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      inputProps: {
+                        step: 300, // Set the step to 5 minutes (300 seconds)
+                      },
+                    }}
+                  />
+                </>
+              ) : (
+                <TextField
+                  margin="dense"
+                  id="workingPeriod"
+                  label={`Actual working in ${workPeriodType}`}
+                  type="number"
+                  fullWidth
+                  variant="standard"
+                  name="workingPeriod"
+                  value={projectData.workingPeriod}
+                  onChange={handleChange}
+                />
+              )}
+              {workPeriodType === "days" ? (
+                <TextField
+                  margin="dense"
+                  id="projectPeriod"
+                  label={`Total project period in ${workPeriodType}`}
+                  type="number"
+                  fullWidth
+                  variant="standard"
+                  name="projectPeriod"
+                  value={projectData.projectPeriod}
+                  onChange={handleChange}
+                />
+              ) : null}
               <label className=" text-[12px] text-sky-700">
                 Conversion rate*
               </label>
-
               <TextField
                 margin="dense"
                 id="conversionRate"
@@ -300,7 +438,11 @@ export default function CompoAddProject({
                 fullWidth
                 variant="standard"
                 name="conversionRate"
-                value={projectData.conversionRate}
+                value={
+                  projectData.conversionRate <= 0
+                    ? ""
+                    : projectData.conversionRate
+                }
                 onChange={handleChange}
                 required
               />
@@ -308,7 +450,11 @@ export default function CompoAddProject({
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={(e) => handleSubmit(e)}>Add Project</Button>
+            {!toEdit ? (
+              <Button onClick={(e) => handleAddSubmit(e)}>Add Project</Button>
+            ) : (
+              <Button onClick={(e) => handleEditSubmit(e)}>Edit Project</Button>
+            )}
           </DialogActions>
         </Dialog>
       </div>

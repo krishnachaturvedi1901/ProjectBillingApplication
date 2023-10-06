@@ -20,7 +20,7 @@ export const useFetchAllProjectsByClientId = (clientId: string | undefined) => {
 };
 
 export const useFetchProjectByProjectId = (projectId: string) => {
-  return useQuery(["project", { projectId }], () => getProjectById(projectId));
+  return useQuery(["project", projectId], () => getProjectById(projectId));
 };
 
 export const useAddNewProject = () => {
@@ -30,7 +30,10 @@ export const useAddNewProject = () => {
   return AddProjectMutationHandler;
 };
 
-export const useUpdateProject = (projectId: string) => {
+export const useUpdateProject = (
+  projectId: string | undefined,
+  clientId: string | undefined
+) => {
   const UpdateProjectMutationHandler = useMutation(
     (variables: {
       projectId: string;
@@ -38,21 +41,27 @@ export const useUpdateProject = (projectId: string) => {
     }) => editProject(variables.projectId, variables.updatedProjectData),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["projects"]);
-        queryClient.invalidateQueries(["projects", { projectId }]);
+        if (clientId) {
+          queryClient.invalidateQueries(["projects", clientId]);
+        }
+        if (projectId) {
+          queryClient.invalidateQueries(["project", projectId]);
+        }
       },
     }
   );
   return UpdateProjectMutationHandler;
 };
 
-export const useDeleteProject = (projectId: string) => {
+export const useDeleteProject = (clientId: string | undefined) => {
   const DeleteProjectMutationHandler = useMutation(
     (projectId: string) => deleteProject(projectId),
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["projects"]);
-        queryClient.invalidateQueries(["projects", { projectId }]);
+      onSuccess: (data) => {
+        console.log("after delete in query-", data);
+        if (clientId) {
+          queryClient.invalidateQueries(["projects", clientId]);
+        }
       },
     }
   );

@@ -10,6 +10,7 @@ import { ThemeContextProvider } from "./states/context/ThemeContext/ThemeContext
 import { WindowWidthContextProvider } from "./states/context/WindowWidthContext/WindowWidthContext";
 import { Provider } from "react-redux";
 import { store } from "./states/redux/store";
+import { SnackbarProvider } from "notistack";
 export const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -21,7 +22,9 @@ root.render(
         <WindowWidthContextProvider>
           <ThemeContextProvider>
             <AuthContextProvider>
-              <App />
+              <SnackbarProvider maxSnack={3}>
+                <App />
+              </SnackbarProvider>
             </AuthContextProvider>
           </ThemeContextProvider>
         </WindowWidthContextProvider>

@@ -8,7 +8,7 @@ export async function getAllProjectsByClientId(clientId: string) {
     token = token.substring(1, token.length - 1);
   }
   try {
-    const response = await axios(`${config.apiUrlProject}/${clientId}`, {
+    const response = await axios(`${config.apiUrlProject}/client/${clientId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
