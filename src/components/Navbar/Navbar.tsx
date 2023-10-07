@@ -12,8 +12,8 @@ const Navbar = () => {
   };
   return (
     <>
-      <nav className="h-18 w-auto mb-0 text-colorDarkFont dark:text-colorLightFont bg-slate-50 dark:bg-slate-700 drop-shadow-md shadow-slate-400   dark:shadow-slate-300   flex justify-between p-4  items-center text-xl sticky top-0 z-50 ">
-        <div className="mx-8 font-poppins-bold text-2xl tracking-widest ">
+      <nav className="h-18 w-auto mb-0 text-colorDarkFont dark:text-colorLightFont bg-slate-50 dark:bg-slate-800 drop-shadow-md shadow-slate-400   dark:shadow-slate-300   flex justify-between p-4  items-center text-xl sticky top-0 z-50 ">
+        <div className="mx-8 font-poppins-bold text-2xl text-[darkorchid] dark:text-[orchid] tracking-widest ">
           Biller
         </div>
         <div className="flex justify-between ">

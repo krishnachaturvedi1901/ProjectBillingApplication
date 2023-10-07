@@ -60,12 +60,6 @@ export default function CompoAddProject({
     adminId: "",
     clientId: "",
   });
-  console.log("projectData", projectData);
-  console.log(
-    "outside useEffect------------------------------>",
-    adminId,
-    clientId
-  );
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -130,7 +124,7 @@ export default function CompoAddProject({
     if (obj.conversionRate === "") {
       setProjectData({ ...obj, conversionRate: 1 });
     }
-    if (obj.clientId === "" || obj.adminId === "") {
+    if (obj.clientId.length <= 0 || obj.adminId.length <= 0) {
       setFormError("ClientId and AdminId compulsary. Refresh and try again !!");
       return false;
     }
@@ -210,7 +204,7 @@ export default function CompoAddProject({
   React.useEffect(() => {
     if (toEdit && projectToEdit) {
       setProjectData(projectToEdit);
-    } else if (!toEdit) {
+    } else if (!toEdit && forAddProject) {
       setProjectData({
         projectName: "",
         projectManager: "",
@@ -225,7 +219,7 @@ export default function CompoAddProject({
         clientId: clientId ? clientId : "",
       });
     }
-  }, [toEdit, forAddProject, projectToEdit]);
+  }, [toEdit, forAddProject, projectToEdit, clientId, adminId]);
 
   React.useEffect(() => {
     if (clientId) {
@@ -249,9 +243,14 @@ export default function CompoAddProject({
   };
 
   console.log(
+    "outside useEffect------------------------------>",
+    adminId,
+    clientId
+  );
+  console.log(
     "toEdit",
     toEdit,
-    "Edit will render------------------------------------>",
+    "Add will render------------------------------------>",
     forAddProject,
     "Projectto edit obj",
     projectToEdit,
@@ -261,8 +260,8 @@ export default function CompoAddProject({
 
   return (
     <>
-      <div className="flex w-screen justify-end pr-12 pt-4">
-        {forAddProject ? (
+      {forAddProject ? (
+        <div className="flex w-screen justify-end pr-12 pt-4">
           <Button
             disabled={!clientId || !adminId}
             variant="contained"
@@ -277,23 +276,30 @@ export default function CompoAddProject({
           >
             Add Project
           </Button>
-        ) : (
+        </div>
+      ) : (
+        <div className="">
           <Button
             disabled={!clientId || !adminId}
-            variant="contained"
+            variant="outlined"
             sx={{
-              backgroundColor: "darkorchid",
+              // backgroundColor: "darkorchid",
+              color: "orchid",
+              borderColor: "orchid",
+              // color: "darkorchid",
               ":hover": {
+                borderColor: "darkorchid",
                 backgroundColor: "#7f05bc",
+                color: "white",
               },
               cursor: "pointer",
             }}
             onClick={() => handleEditProjectClick()}
           >
-            Edit
+            <CiEdit size={25} />
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Add Project</DialogTitle>;
@@ -331,19 +337,6 @@ export default function CompoAddProject({
                 value={projectData.projectManager}
                 onChange={handleChange}
               />
-              <TextField
-                margin="dense"
-                id="rate"
-                label={`Rate (${currencyType}/${
-                  workPeriodType === "days" ? "months" : "hours"
-                })`}
-                type="number"
-                fullWidth
-                variant="standard"
-                name="rate"
-                value={projectData.rate === 0 ? "" : projectData.rate}
-                onChange={handleChange}
-              />
               <div className="flex ">
                 <TextField
                   select
@@ -376,6 +369,32 @@ export default function CompoAddProject({
                   <MenuItem value="days">Months</MenuItem>
                 </TextField>
               </div>
+              <TextField
+                margin="dense"
+                id="rate"
+                label={`Rate (${currencyType}/${
+                  workPeriodType === "days" ? "months" : "hours"
+                })`}
+                type="number"
+                fullWidth
+                variant="standard"
+                name="rate"
+                value={projectData.rate === 0 ? "" : projectData.rate}
+                onChange={handleChange}
+              />
+              {workPeriodType === "days" ? (
+                <TextField
+                  margin="dense"
+                  id="projectPeriod"
+                  label={`Total project period in ${workPeriodType}`}
+                  type="number"
+                  fullWidth
+                  variant="standard"
+                  name="projectPeriod"
+                  value={projectData.projectPeriod}
+                  onChange={handleChange}
+                />
+              ) : null}
               {workPeriodType === "hours" ? (
                 <>
                   <label className=" text-[12px] text-sky-700">
@@ -415,19 +434,6 @@ export default function CompoAddProject({
                   onChange={handleChange}
                 />
               )}
-              {workPeriodType === "days" ? (
-                <TextField
-                  margin="dense"
-                  id="projectPeriod"
-                  label={`Total project period in ${workPeriodType}`}
-                  type="number"
-                  fullWidth
-                  variant="standard"
-                  name="projectPeriod"
-                  value={projectData.projectPeriod}
-                  onChange={handleChange}
-                />
-              ) : null}
               <label className=" text-[12px] text-sky-700">
                 Conversion rate*
               </label>

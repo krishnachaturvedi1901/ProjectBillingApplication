@@ -14,23 +14,27 @@ table caption {
 
 table tr {
   background-color: #f8f8f8;
-  border: 1px solid #ddd;
+  border-bottom: 1px solid #969696;
   padding: 0.35em;
 }
 
 table th,
 table td {
-  padding: 0.625em;
+  padding: 0.62em;
   text-align: center;
 }
 
 table th {
+  border-bottom: 2px solid #969696;
   font-size: 0.85em;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+table tr:last-child {
+  border-bottom: 0;
+}
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   table {
     border: 0;
   }
@@ -51,13 +55,12 @@ table th {
   }
 
   table tr {
-    border-bottom: 3px solid #ddd;
     display: block;
     margin-bottom: 0.625em;
   }
 
   table td {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #969696;
     display: block;
     font-size: 0.8em;
     text-align: right;
@@ -72,9 +75,5 @@ table th {
     float: left;
     font-weight: bold;
     text-transform: uppercase;
-  }
-
-  table td:last-child {
-    border-bottom: 0;
   }
 }

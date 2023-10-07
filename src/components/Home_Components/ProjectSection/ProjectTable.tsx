@@ -8,15 +8,14 @@ import {
   useDeleteProject,
   useFetchAllProjectsByClientId,
 } from "../../../states/query/Project_queries/projectQueries";
-import CompoLoadingProjects from "./CompoLoadingProjects";
-import { Alert } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { queryClient } from "../../..";
 import { useSnackbar } from "notistack";
 
 const ProjectTable = () => {
   const { enqueueSnackbar } = useSnackbar();
-  // ---------------------------------------------------
+  // -----------------------------------------------------
   const [toEdit, setToEdit] = useState<boolean>();
   const handleToAddClick = () => {
     setToEdit(false);
@@ -112,7 +111,7 @@ const ProjectTable = () => {
     );
   }
   return (
-    <section>
+    <section className="">
       <div>
         <CompoAddProject
           open={open}
@@ -126,39 +125,72 @@ const ProjectTable = () => {
           handleToEditClick={handleToEditClick}
         />
       </div>
-      <div className="dark:bg-slate-600 dark:text-colorLightFont ">
-        <table className="dark:bg-slate-950 dark:text-colorLightFont">
+      <div className=" dark:text-colorLightFont px-8 pb-4 ">
+        <table className="border-none">
           <caption className="text-xl font-bold text-center p-4 ">
             PROJECT DETAILS
           </caption>
           <thead>
-            <tr className="dark:bg-slate-950 dark:text-colorLightFont border-none ">
-              <th>Sr.no.</th>
+            <tr className="dark:bg-slate-800 dark:text-colorLightFont ">
+              <th className=" md:flex md:pl-8 ">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      sx={{
+                        color: "darkorchid",
+                        "&.Mui-checked": {
+                          color: "darkorchid",
+                        },
+                      }}
+                    />
+                  }
+                  label="Sr.no."
+                />
+              </th>
               <th>Project</th>
               <th>Project Period</th>
               <th>Rate</th>
               <th>Working Period</th>
               <th>Conversion Rate</th>
               <th>Amount</th>
-              <th>Edit</th>
-              <th>Delete</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {data?.map((project: any, index: any) => {
               return (
                 <tr
-                  className="dark:bg-slate-950 dark:text-colorLightFont border-none"
+                  className="dark:bg-slate-800 dark:text-colorLightFont  "
                   key={project._id}
                 >
-                  <td data-label="Sr.no.">{index + 1}</td>
+                  <td data-label="Sr.no." className=" md:flex md:pl-8 ">
+                    <FormControlLabel
+                      label={index + 1}
+                      control={
+                        <Checkbox
+                          sx={{
+                            color: "darkorchid",
+                            "&.Mui-checked": {
+                              color: "darkorchid",
+                            },
+                          }}
+                        />
+                      }
+                    />
+                  </td>
                   <td data-label="Project">
                     {project.projectName}
-                    <br />({project.projectManager})
+                    <br />
+                    {project.projectManager}
                   </td>
                   <td data-label="Project Period">
-                    {project.periodFrom}
-                    <br /> {project.periodTo}
+                    {project.projectPeriod ? (
+                      <>
+                        {project.projectPeriod} ({project.workingPeriodType}){" "}
+                      </>
+                    ) : (
+                      "Hour based project"
+                    )}
                   </td>
                   <td data-label="Rate">
                     {project.rate}(
@@ -171,9 +203,9 @@ const ProjectTable = () => {
                     ) : null}
                     /{project.workingPeriodType})
                   </td>
-                  {/* <td data-label="Working Period">
+                  <td data-label="Working Period">
                     {project.workingPeriod}({project.workingPeriodType})
-                  </td> */}
+                  </td>
                   <td data-label="Conversion Rate">
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9; </span>
@@ -188,26 +220,34 @@ const ProjectTable = () => {
                     {" "}
                     &#x20B9; {project.amount ? project.amount : 0}
                   </td>
-                  <td data-label="Edit">
-                    <CompoAddProject
-                      open={open}
-                      handleClickOpen={handleClickOpen}
-                      handleClose={handleClose}
-                      clientId={selectedClientState.data._id}
-                      adminId={adminId}
-                      forAddProject={false}
-                      projectToEdit={project}
-                      toEdit={toEdit}
-                      handleToAddClick={handleToAddClick}
-                      handleToEditClick={handleToEditClick}
-                    />
-                  </td>
-                  <td
-                    data-label="Delete"
-                    className="text-center cursor-pointer"
-                    onClick={() => handleProjectDelete(project._id)}
-                  >
-                    <RiDeleteBin7Line />
+                  <td>
+                    <div className="h-14 md:h-auto flex  justify-between items-center md:justify-around ">
+                      <td>
+                        <CompoAddProject
+                          open={open}
+                          handleClickOpen={handleClickOpen}
+                          handleClose={handleClose}
+                          clientId={selectedClientState.data._id}
+                          adminId={adminId}
+                          forAddProject={false}
+                          projectToEdit={project}
+                          toEdit={toEdit}
+                          handleToAddClick={handleToAddClick}
+                          handleToEditClick={handleToEditClick}
+                        />
+                      </td>
+                      <td
+                        className=" cursor-pointer 
+                      opacity-70 hover:opacity-100 "
+                        onClick={() => handleProjectDelete(project._id)}
+                      >
+                        <RiDeleteBin7Line
+                          color="orchid"
+                          size={25}
+                          style={{ margin: "auto" }}
+                        />
+                      </td>
+                    </div>
                   </td>
                 </tr>
               );

@@ -113,7 +113,7 @@ const SelectClient = () => {
 
   return (
     <section>
-      <div className="flex justify-around sm:justify-end items-center pr-4 sm:pr-8 sticky top-16 bg-slate-200 dark:bg-slate-600 z-10 ">
+      <div className="flex justify-around sm:justify-end items-center pr-4 sm:pr-8 sticky top-16 bg-slate-200 dark:bg-slate-700 z-10 ">
         <div>
           <ConfirmationDialog clientsArr={clientsArr} adminId={adminId} />
         </div>
@@ -126,7 +126,7 @@ const SelectClient = () => {
           />
         </div>
       </div>
-      <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-700 bg-opacity-50 shadow-lg dark:shadow-slate-800 sm:p-2 ">
+      <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-800 bg-opacity-50 shadow-lg dark:shadow-slate-800 sm:p-2 ">
         <div className="w-1/2 ">
           {data ? (
             <div className="text-black dark:text-colorLightFont p-4">
