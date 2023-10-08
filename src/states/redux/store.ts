@@ -3,12 +3,14 @@ import adminReducer from "./AdminStates/adminSlice";
 import allClientsReducer from "./ClientStates/allClientSlice";
 import addClientReducer from "./ClientStates/addClientSlice";
 import selectedClientReducer from "./ClientStates/selectedClientSlice";
+import projectsForInvoiceReducer from "./InvoiceProjectState/addProjectForInvoiceSlice";
 export const store = configureStore({
   reducer: {
     adminState: adminReducer,
     allClientsState: allClientsReducer,
     addClientState: addClientReducer,
     selectedClientState: selectedClientReducer,
+    projectsForInvoiceState: projectsForInvoiceReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;

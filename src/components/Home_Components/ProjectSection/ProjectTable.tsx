@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import "./ProjectTable.module.css";
 import CompoAddProject from "./CompoAddProject";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../states/redux/store";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
 import {
@@ -12,26 +12,18 @@ import { Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { queryClient } from "../../..";
 import { useSnackbar } from "notistack";
+import { ProjectType } from "../../../types/types";
+import {
+  addAllProjectsForInvoiceAction,
+  addProjectForInvoiceAction,
+  removeAllProjectsFromInvoiceAction,
+  removeProjectFromInvoiceAction,
+} from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
 
 const ProjectTable = () => {
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  // -----------------------------------------------------
-  const [toEdit, setToEdit] = useState<boolean>();
-  const handleToAddClick = () => {
-    setToEdit(false);
-  };
-  const handleToEditClick = () => {
-    setToEdit(true);
-  };
 
-  // ------------------------------------------------------
-  const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
   // -----------------------------------------------------
   const { isAuth, adminId } = useContext(AuthContext);
   const selectedClientState = useSelector(
@@ -43,6 +35,12 @@ const ProjectTable = () => {
   const DeleteProjectMutationHandler = useDeleteProject(
     selectedClientState.data._id
   );
+  // -----------------------------------------------------
+  const [allChecked, setAllChecked] = useState<boolean>();
+  type CheckboxRefType = React.RefObject<HTMLInputElement>;
+  const checkboxesRefs = useRef<CheckboxRefType[]>([]);
+
+  console.log("Chekboxref--------------------==>", checkboxesRefs);
 
   const handleProjectDelete = (projectId: string) => {
     DeleteProjectMutationHandler.mutate(projectId, {
@@ -60,31 +58,25 @@ const ProjectTable = () => {
     });
   };
 
-  console.log(
-    isLoading,
-    data,
-    isError,
-    "->",
-    "clientId",
-    selectedClientState.data._id,
-    "adminId->",
-    adminId
-  );
+  // console.log(
+  //   isLoading,
+  //   data,
+  //   isError,
+  //   "->",
+  //   "clientId",
+  //   selectedClientState.data._id,
+  //   "adminId->",
+  //   adminId
+  // );
 
   if (isError || isLoading || data === "" || data.length <= 0) {
     return (
       <div>
         <div>
           <CompoAddProject
-            open={open}
-            handleClickOpen={handleClickOpen}
-            handleClose={handleClose}
             clientId={selectedClientState.data._id}
             adminId={adminId}
             forAddProject={true}
-            toEdit={toEdit}
-            handleToAddClick={handleToAddClick}
-            handleToEditClick={handleToEditClick}
           />
         </div>
         <div className="text-xl font-bold text-center p-4 ">
@@ -110,19 +102,62 @@ const ProjectTable = () => {
       </div>
     );
   }
+
+  const handleAllCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    data: ProjectType[]
+  ) => {
+    console.log("====allChecked====>", e.target.checked);
+    let isAllChecked = e.target.checked;
+    setAllChecked(isAllChecked);
+
+    checkboxesRefs.current.forEach((checkboxRef) => {
+      if (checkboxRef.current) {
+        checkboxRef.current.checked = isAllChecked;
+      }
+    });
+
+    if (isAllChecked) {
+      dispatch(addAllProjectsForInvoiceAction(data));
+    } else if (!isAllChecked) {
+      dispatch(removeAllProjectsFromInvoiceAction());
+    }
+  };
+
+  const handleSingleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    project: ProjectType
+  ) => {
+    const isChecked = e.target.checked;
+    console.log("single checkbox checked-", isChecked, e.target);
+    checkboxesRefs.current.forEach((checkboxRef) => {
+      if (checkboxRef.current) {
+        checkboxRef.current.checked = isChecked;
+      }
+    });
+
+    const areAllChecked = checkboxesRefs.current.every(
+      (checkboxRef) => checkboxRef.current?.checked
+    );
+    setAllChecked(areAllChecked);
+    console.log("outside remove elseif-single project=====>", project._id);
+
+    if (isChecked) {
+      dispatch(addProjectForInvoiceAction(project));
+    } else if (!isChecked && project._id) {
+      console.log("Inside remove elseif-single project=====>", project._id);
+      dispatch(removeProjectFromInvoiceAction(project._id));
+    }
+  };
+
   return (
     <section className="">
       <div>
         <CompoAddProject
-          open={open}
-          handleClickOpen={handleClickOpen}
-          handleClose={handleClose}
           clientId={selectedClientState.data._id}
           adminId={adminId}
           forAddProject={true}
-          toEdit={toEdit}
-          handleToAddClick={handleToAddClick}
-          handleToEditClick={handleToEditClick}
         />
       </div>
       <div className=" dark:text-colorLightFont px-8 pb-4 ">
@@ -142,6 +177,7 @@ const ProjectTable = () => {
                           color: "darkorchid",
                         },
                       }}
+                      onChange={(e) => handleAllCheckboxChange(e, data)}
                     />
                   }
                   label="Sr.no."
@@ -158,25 +194,25 @@ const ProjectTable = () => {
           </thead>
           <tbody>
             {data?.map((project: any, index: any) => {
+              // checkboxesRefs.current[index] = useRef<HTMLInputElement>(null);
+
               return (
                 <tr
                   className="dark:bg-slate-800 dark:text-colorLightFont  "
                   key={project._id}
                 >
                   <td data-label="Sr.no." className=" md:flex md:pl-8 ">
-                    <FormControlLabel
-                      label={index + 1}
-                      control={
-                        <Checkbox
-                          sx={{
-                            color: "darkorchid",
-                            "&.Mui-checked": {
-                              color: "darkorchid",
-                            },
-                          }}
-                        />
-                      }
-                    />
+                    <div className=" flex justify-end items-center md:justify-start md:w-full md:text-start md:mt-4">
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 border-2  accent-[darkorchid] cursor-pointer mr-4 "
+                        ref={checkboxesRefs.current[index]}
+                        onChange={(e) =>
+                          handleSingleCheckboxChange(e, index, project)
+                        }
+                      />
+                      <label>{index + 1}</label>
+                    </div>
                   </td>
                   <td data-label="Project">
                     {project.projectName}
@@ -222,21 +258,15 @@ const ProjectTable = () => {
                   </td>
                   <td>
                     <div className="h-14 md:h-auto flex  justify-between items-center md:justify-around ">
-                      <td>
+                      <div>
                         <CompoAddProject
-                          open={open}
-                          handleClickOpen={handleClickOpen}
-                          handleClose={handleClose}
                           clientId={selectedClientState.data._id}
                           adminId={adminId}
                           forAddProject={false}
                           projectToEdit={project}
-                          toEdit={toEdit}
-                          handleToAddClick={handleToAddClick}
-                          handleToEditClick={handleToEditClick}
                         />
-                      </td>
-                      <td
+                      </div>
+                      <div
                         className=" cursor-pointer 
                       opacity-70 hover:opacity-100 "
                         onClick={() => handleProjectDelete(project._id)}
@@ -246,7 +276,7 @@ const ProjectTable = () => {
                           size={25}
                           style={{ margin: "auto" }}
                         />
-                      </td>
+                      </div>
                     </div>
                   </td>
                 </tr>

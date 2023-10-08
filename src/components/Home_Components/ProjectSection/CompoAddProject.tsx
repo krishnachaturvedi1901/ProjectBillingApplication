@@ -18,29 +18,35 @@ import { CiEdit } from "react-icons/ci";
 import { useSnackbar } from "notistack";
 
 export default function CompoAddProject({
-  open,
-  handleClickOpen,
-  handleClose,
   adminId,
   clientId,
   forAddProject,
   projectToEdit,
-  toEdit,
-  handleToAddClick,
-  handleToEditClick,
 }: {
-  open: boolean;
-  handleClickOpen: () => void;
-  handleClose: () => void;
   clientId: string | undefined;
   adminId: string | null;
   forAddProject: boolean;
   projectId?: string | undefined;
   projectToEdit?: ProjectType;
-  toEdit: boolean | undefined;
-  handleToAddClick: () => void;
-  handleToEditClick: () => void;
 }) {
+  // -----------------------------------------------------
+  const [toEdit, setToEdit] = useState<boolean>();
+  const handleToAddClick = () => {
+    setToEdit(false);
+  };
+  const handleToEditClick = () => {
+    setToEdit(true);
+  };
+
+  // ------------------------------------------------------
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  // --------------------------------------------------------
   const { enqueueSnackbar } = useSnackbar();
   const [workPeriodType, setWorkPeriodType] = useState("hours");
   const [currencyType, setCurrencyType] = useState("rupees");
@@ -202,9 +208,7 @@ export default function CompoAddProject({
   };
 
   React.useEffect(() => {
-    if (toEdit && projectToEdit) {
-      setProjectData(projectToEdit);
-    } else if (!toEdit && forAddProject) {
+    if (!toEdit) {
       setProjectData({
         projectName: "",
         projectManager: "",
@@ -218,6 +222,9 @@ export default function CompoAddProject({
         adminId: adminId ? adminId : "",
         clientId: clientId ? clientId : "",
       });
+    }
+    if (toEdit && projectToEdit) {
+      setProjectData(projectToEdit);
     }
   }, [toEdit, forAddProject, projectToEdit, clientId, adminId]);
 
@@ -242,11 +249,11 @@ export default function CompoAddProject({
     handleClickOpen();
   };
 
-  console.log(
-    "outside useEffect------------------------------>",
-    adminId,
-    clientId
-  );
+  // console.log(
+  //   "outside useEffect------------------------------>",
+  //   adminId,
+  //   clientId
+  // );
   console.log(
     "toEdit",
     toEdit,
@@ -254,7 +261,7 @@ export default function CompoAddProject({
     forAddProject,
     "Projectto edit obj",
     projectToEdit,
-    "alreasy project available-",
+    "already project available-",
     projectData
   );
 
@@ -283,10 +290,8 @@ export default function CompoAddProject({
             disabled={!clientId || !adminId}
             variant="outlined"
             sx={{
-              // backgroundColor: "darkorchid",
               color: "orchid",
               borderColor: "orchid",
-              // color: "darkorchid",
               ":hover": {
                 borderColor: "darkorchid",
                 backgroundColor: "#7f05bc",
