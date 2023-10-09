@@ -37,6 +37,7 @@ export const ThemeContextProvider: React.FC<ContextProviderType> = ({
       document.body.classList.add("dark");
     }
   }, []);
+
   return (
     <ThemeContext.Provider value={{ visibility, updateVisibility }}>
       {children}

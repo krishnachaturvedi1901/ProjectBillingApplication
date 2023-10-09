@@ -2,7 +2,7 @@ import * as React from "react";
 import { Global } from "@emotion/react";
 import { styled, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { grey } from "@mui/material/colors";
+import { deepPurple, grey, purple } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
@@ -53,6 +53,7 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function InvoiceDrawer(props: Props) {
+  const materialTheme = useTheme();
   const adminState = useSelector((state: RootState) => state.adminState);
   const selectedClientState = useSelector(
     (state: RootState) => state.selectedClientState
@@ -137,8 +138,6 @@ export default function InvoiceDrawer(props: Props) {
   };
 
   // This is used only for the example
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Root>
@@ -151,11 +150,22 @@ export default function InvoiceDrawer(props: Props) {
           },
         }}
       />
-      <Box sx={{ textAlign: "center", pt: 1 }}>
-        <Button onClick={toggleDrawer(true)}>Open</Button>
+      <Box
+        sx={{
+          position: "fixed",
+          top: "89%",
+          right: "12%",
+          maxWidth: "100px",
+          height: "40px",
+          zIndex: 60,
+          color: "white",
+        }}
+      >
+        <Button variant="contained" onClick={toggleDrawer(true)} sx={{}}>
+          Invoice
+        </Button>
       </Box>
       <SwipeableDrawer
-        container={container}
         anchor="bottom"
         open={open}
         onClose={toggleDrawer(false)}
@@ -175,15 +185,24 @@ export default function InvoiceDrawer(props: Props) {
             visibility: "visible",
             right: 0,
             left: 0,
+            bgcolor: deepPurple[700],
           }}
         >
           <Puller />
           <Typography
-            sx={{ p: 2, color: "text.primary", fontWeight: "semibold" }}
+            sx={{ p: 2, color: purple[100], fontWeight: "semibold" }}
             variant="h6"
           >
-            Create invoice required details.
+            Fill invoice required details.
           </Typography>
+          <Box
+            sx={{
+              width: "98%",
+              borderBottom: "1px solid",
+              borderColor: deepPurple[900],
+              m: "auto",
+            }}
+          ></Box>
         </StyledBox>
         <StyledBox
           sx={{
@@ -195,8 +214,8 @@ export default function InvoiceDrawer(props: Props) {
         >
           <Box
             sx={{
-              display: { sx: "block", md: "flex" },
-              py: "10px",
+              display: { xs: "block", sm: "flex", md: "flex" },
+              pt: "20px",
               px: "20px",
               justifyContent: "space-between",
             }}
@@ -207,6 +226,7 @@ export default function InvoiceDrawer(props: Props) {
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
+                pt: "10px",
               }}
             >
               {windowWidth && windowWidth > 768 ? (
@@ -247,9 +267,10 @@ export default function InvoiceDrawer(props: Props) {
             </Box>
             <Box
               sx={{
-                minWidth: { sx: "100px", md: "300px" },
+                minWidth: { xs: "100px", sm: "250px", md: "300px" },
                 padding: "5px",
                 mr: "15px",
+                pb: { xs: "40px", sm: "15px" },
               }}
             >
               <p className=" text-xl md:text-2xl border-b-2 border-slate-800 border-opacity-70 mb-4 mt-4 md:mt-1 ">
@@ -284,16 +305,46 @@ export default function InvoiceDrawer(props: Props) {
             sx={{
               display: "flex",
               justifyContent: {
-                sx: "space-around",
+                xs: "space-between",
+                sm: "flex-end",
                 md: "flex-end",
-                px: "20px",
               },
+              width: { xs: "100%", sm: "100%" },
+              mt: "20px",
+              px: { xs: "0px", sm: "35px", md: "38px" },
+              position: { xs: "fixed", sm: "static" },
+              bottom: "0%",
+              left: "1%",
             }}
           >
-            <Button sx={{ bgcolor: "red", mr: { sx: "5px", md: "15px" } }}>
+            <Button
+              sx={{
+                width: { xs: "50%", sm: "150px" },
+                backgroundColor: deepPurple[700],
+                color: purple[100],
+                ":hover": {
+                  backgroundColor: deepPurple[800],
+                },
+                padding: { sm: "10px 25px" },
+                mr: { xs: "3px", sm: "35px", md: "40px" },
+              }}
+            >
               Download
             </Button>
-            <Button sx={{ bgcolor: "red" }}>Preview</Button>
+            <Button
+              sx={{
+                width: { xs: "50%", sm: "150px" },
+
+                backgroundColor: deepPurple[700],
+                color: purple[100],
+                ":hover": {
+                  backgroundColor: deepPurple[800],
+                },
+                padding: "10px 25px",
+              }}
+            >
+              Preview
+            </Button>
           </Box>
         </StyledBox>
       </SwipeableDrawer>
