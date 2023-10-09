@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
-import { Alert, LinearProgress, MenuItem } from "@mui/material";
+import { Alert, LinearProgress, MenuItem, useTheme } from "@mui/material";
 import { ProjectType, UpdateProjectDataType } from "../../../types/types";
 import {
   useAddNewProject,
@@ -47,6 +47,7 @@ export default function CompoAddProject({
     setOpen(false);
   };
   // --------------------------------------------------------
+  const materialTheme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [workPeriodType, setWorkPeriodType] = useState("hours");
   const [currencyType, setCurrencyType] = useState("rupees");
@@ -254,16 +255,16 @@ export default function CompoAddProject({
   //   adminId,
   //   clientId
   // );
-  console.log(
-    "toEdit",
-    toEdit,
-    "Add will render------------------------------------>",
-    forAddProject,
-    "Projectto edit obj",
-    projectToEdit,
-    "already project available-",
-    projectData
-  );
+  // console.log(
+  //   "toEdit",
+  //   toEdit,
+  //   "Add will render------------------------------------>",
+  //   forAddProject,
+  //   "Projectto edit obj",
+  //   projectToEdit,
+  //   "already project available-",
+  //   projectData
+  // );
 
   return (
     <>
@@ -273,9 +274,9 @@ export default function CompoAddProject({
             disabled={!clientId || !adminId}
             variant="contained"
             sx={{
-              backgroundColor: "darkorchid",
+              backgroundColor: materialTheme.palette.primary.main,
               ":hover": {
-                backgroundColor: "#7f05bc",
+                backgroundColor: materialTheme.palette.secondary.main,
               },
               cursor: "pointer",
             }}
@@ -290,11 +291,11 @@ export default function CompoAddProject({
             disabled={!clientId || !adminId}
             variant="outlined"
             sx={{
-              color: "orchid",
-              borderColor: "orchid",
+              color: materialTheme.palette.primary.main,
+              borderColor: materialTheme.palette.primary.main,
               ":hover": {
-                borderColor: "darkorchid",
-                backgroundColor: "#7f05bc",
+                borderColor: materialTheme.palette.secondary.main,
+                backgroundColor: materialTheme.palette.secondary.main,
                 color: "white",
               },
               cursor: "pointer",

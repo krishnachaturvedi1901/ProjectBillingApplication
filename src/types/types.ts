@@ -65,16 +65,17 @@ export interface UpdateProjectDataType {
   amount?: number | null;
 }
 export interface InvoiceType {
-  id: number;
+  _id?: string;
   invoiceNo: number;
   billDate: string;
   dueDate: string;
   amountWithoutTax: number;
   amountAfterTax: number;
-  clientId: number;
-  adminId: number;
-  projects: number[];
+  clientId: string;
+  adminId: string;
+  projectsId: string[];
 }
+
 export interface LoginDataType {
   email: string;
   password: string;

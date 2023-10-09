@@ -17,7 +17,7 @@ import {
   StateInfoType,
 } from "../../../types/types";
 import SelectCountryStateCity from "./Compo_CountrySelect";
-import { Alert, Typography } from "@mui/material";
+import { Alert, Typography, useTheme } from "@mui/material";
 
 export default function CompoAddClient({
   open,
@@ -30,6 +30,7 @@ export default function CompoAddClient({
   handleClose: () => void;
   user: string;
 }) {
+  const materialTheme = useTheme();
   const [selectedCountry, setSelectedCountry] = useState<CountryInfoType>(
     {} as CountryInfoType
   );
@@ -145,9 +146,9 @@ export default function CompoAddClient({
       <Button
         variant="contained"
         sx={{
-          backgroundColor: "darkorchid",
+          backgroundColor: materialTheme.palette.primary.main,
           ":hover": {
-            backgroundColor: "#7f05bc",
+            backgroundColor: materialTheme.palette.secondary.main,
           },
         }}
         onClick={handleClickOpen}

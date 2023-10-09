@@ -17,6 +17,8 @@ import { useDispatch } from "react-redux";
 import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
 import { AppDispatch } from "../../../states/redux/store";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
+import { removeAllProjectsFromInvoiceAction } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
+import { useTheme } from "@mui/material";
 
 function ConfirmationDialogRaw(props: {
   onClose: (newValue: string) => void;
@@ -103,12 +105,14 @@ export default function ConfirmationDialog({
   clientsArr: ClientType[];
   adminId: string | null;
 }) {
+  const materialTheme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
   React.useEffect(() => {
     if (value.length > 0) {
       dispatch(getClientByIdAction(value));
+      dispatch(removeAllProjectsFromInvoiceAction());
     }
   }, [value, dispatch]);
 
@@ -143,14 +147,14 @@ export default function ConfirmationDialog({
         >
           <Button
             sx={{
-              backgroundColor: "darkorchid",
+              backgroundColor: materialTheme.palette.primary.main,
               color: "white",
               padding: { sx: "3px 5px", sm: "7px 8px" },
               fontSize: { sx: "8px", sm: "14px" },
               borderRadius: "2px",
               transition: "background-color 0.3s, box-shadow 0.3s",
               "&:hover": {
-                backgroundColor: "#7f05bc",
+                backgroundColor: materialTheme.palette.secondary.main,
               },
               boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
             }}

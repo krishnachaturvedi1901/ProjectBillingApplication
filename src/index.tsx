@@ -10,10 +10,24 @@ import { WindowWidthContextProvider } from "./states/context/WindowWidthContext/
 import { Provider } from "react-redux";
 import { store } from "./states/redux/store";
 import { SnackbarProvider } from "notistack";
+import { ThemeProvider, createTheme } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 export const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#7873C9",
+    },
+    secondary: {
+      main: "#6761cc",
+    },
+  },
+});
+
 root.render(
   <Provider store={store}>
     <BrowserRouter>
@@ -22,7 +36,11 @@ root.render(
           <ThemeContextProvider>
             <AuthContextProvider>
               <SnackbarProvider maxSnack={3}>
-                <App />
+                <ThemeProvider theme={theme}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <App />
+                  </LocalizationProvider>
+                </ThemeProvider>
               </SnackbarProvider>
             </AuthContextProvider>
           </ThemeContextProvider>

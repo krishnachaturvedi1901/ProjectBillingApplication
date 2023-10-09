@@ -19,6 +19,8 @@ module.exports = {
         colorCancelButton: " #e63946",
         colorNormalButton: "#ffb703",
         colorNormalButtonHover: "#fb8500",
+        thirdColor: "#7873C9",
+        thirdColorHover: "#6761cc",
       },
     },
   },

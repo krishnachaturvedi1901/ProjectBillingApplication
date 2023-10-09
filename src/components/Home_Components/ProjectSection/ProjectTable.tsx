@@ -8,7 +8,7 @@ import {
   useDeleteProject,
   useFetchAllProjectsByClientId,
 } from "../../../states/query/Project_queries/projectQueries";
-import { Alert, Checkbox, FormControlLabel } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel, useTheme } from "@mui/material";
 import { RiDeleteBin7Line } from "react-icons/ri";
 import { queryClient } from "../../..";
 import { useSnackbar } from "notistack";
@@ -23,6 +23,7 @@ import {
 const ProjectTable = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const materialTheme = useTheme();
 
   // -----------------------------------------------------
   const { isAuth, adminId } = useContext(AuthContext);
@@ -37,8 +38,8 @@ const ProjectTable = () => {
   );
   // -----------------------------------------------------
   const [allChecked, setAllChecked] = useState<boolean>();
-  type CheckboxRefType = React.RefObject<HTMLInputElement>;
-  const checkboxesRefs = useRef<CheckboxRefType[]>([]);
+  type CheckboxRefType = Array<HTMLInputElement | null>;
+  const checkboxesRefs = useRef<CheckboxRefType>([]);
 
   console.log("Chekboxref--------------------==>", checkboxesRefs);
 
@@ -112,8 +113,8 @@ const ProjectTable = () => {
     setAllChecked(isAllChecked);
 
     checkboxesRefs.current.forEach((checkboxRef) => {
-      if (checkboxRef.current) {
-        checkboxRef.current.checked = isAllChecked;
+      if (checkboxRef) {
+        checkboxRef.checked = isAllChecked;
       }
     });
 
@@ -131,22 +132,21 @@ const ProjectTable = () => {
   ) => {
     const isChecked = e.target.checked;
     console.log("single checkbox checked-", isChecked, e.target);
-    checkboxesRefs.current.forEach((checkboxRef) => {
-      if (checkboxRef.current) {
-        checkboxRef.current.checked = isChecked;
-      }
-    });
+    // checkboxesRefs.current.forEach((checkboxRef) => {
+    //   if (checkboxRef) {
+    //     checkboxRef.checked = isChecked;
+    //   }
+    // });
 
     const areAllChecked = checkboxesRefs.current.every(
-      (checkboxRef) => checkboxRef.current?.checked
+      (checkboxRef) => checkboxRef?.checked === true
     );
+    console.log("areAllChecked)))))))))))))))))))))-->", areAllChecked);
     setAllChecked(areAllChecked);
-    console.log("outside remove elseif-single project=====>", project._id);
 
     if (isChecked) {
       dispatch(addProjectForInvoiceAction(project));
     } else if (!isChecked && project._id) {
-      console.log("Inside remove elseif-single project=====>", project._id);
       dispatch(removeProjectFromInvoiceAction(project._id));
     }
   };
@@ -171,10 +171,11 @@ const ProjectTable = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
+                      checked={allChecked ? allChecked : false}
                       sx={{
-                        color: "darkorchid",
+                        color: materialTheme.palette.primary.main,
                         "&.Mui-checked": {
-                          color: "darkorchid",
+                          color: materialTheme.palette.primary.main,
                         },
                       }}
                       onChange={(e) => handleAllCheckboxChange(e, data)}
@@ -205,8 +206,10 @@ const ProjectTable = () => {
                     <div className=" flex justify-end items-center md:justify-start md:w-full md:text-start md:mt-4">
                       <input
                         type="checkbox"
-                        className="w-5 h-5 border-2  accent-[darkorchid] cursor-pointer mr-4 "
-                        ref={checkboxesRefs.current[index]}
+                        className="w-5 h-5 border-2  accent-thirdColor cursor-pointer mr-4 "
+                        ref={(element) =>
+                          (checkboxesRefs.current[index] = element)
+                        }
                         onChange={(e) =>
                           handleSingleCheckboxChange(e, index, project)
                         }
@@ -272,7 +275,7 @@ const ProjectTable = () => {
                         onClick={() => handleProjectDelete(project._id)}
                       >
                         <RiDeleteBin7Line
-                          color="orchid"
+                          color={materialTheme.palette.primary.main}
                           size={25}
                           style={{ margin: "auto" }}
                         />
