@@ -20,6 +20,7 @@ import { useAddInvoiceMutation } from "../../../states/query/Invoice_queries/inv
 import { getAdminByIdAction } from "../../../states/redux/AdminStates/adminSlice";
 import DownloadPreview from "../DownloadSection/DownloadPreview";
 import { Margin, usePDF } from "react-to-pdf";
+import { RxCross1 } from "react-icons/rx";
 const drawerBleeding = 56;
 let windowWidth: number | undefined = window.innerWidth;
 
@@ -57,11 +58,6 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function InvoiceDrawer(props: Props) {
-  const { toPDF, targetRef } = usePDF({
-    filename: "invoice.pdf",
-    page: { margin: Margin.LARGE },
-  });
-
   const materialTheme = useTheme();
   const adminState = useSelector((state: RootState) => state.adminState);
   const selectedClientState = useSelector(
@@ -76,6 +72,11 @@ export default function InvoiceDrawer(props: Props) {
   const [taxAmount, setTaxAmount] = React.useState(0);
   const [previewAllowed, setPreviewAllowed] = React.useState(true);
   const [showPreview, setShowPreview] = React.useState(false);
+
+  const { toPDF, targetRef } = usePDF({
+    filename: `invoice${invoiceNo}.pdf`,
+    page: { margin: Margin.LARGE },
+  });
 
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch<AppDispatch>();
@@ -443,12 +444,12 @@ export default function InvoiceDrawer(props: Props) {
         </StyledBox>
       </SwipeableDrawer>
       {showPreview ? (
-        <div className="absolute top-14 right-64 w-2/3 p-7 h-auto border border-red-600 bg-slate-600 z-50 ">
+        <div className="w-screen h-[1200px] absolute top-[0px] right-[0] z-[100] bg-[#989fce] bg-opacity-80 ">
           <div
-            className="fixed top-36 right-60 flex border z-50 cursor-pointer"
+            className="fixed top-[20px] right-[20px] flex  z-50 cursor-pointer hover:bg-inherit"
             onClick={() => previewExecution(false)}
           >
-            Close
+            <RxCross1 size={40} color="black" />
           </div>
 
           <div ref={targetRef}>

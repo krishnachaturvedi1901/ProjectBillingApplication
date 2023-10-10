@@ -1,5 +1,6 @@
 import React from "react";
 import "./DownloadPreview.module.css";
+import dayjs, { Dayjs } from "dayjs";
 import { Link } from "react-router-dom";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -27,113 +28,88 @@ const DownloadPreview = () => {
   ).toFixed(2);
 
   return (
-    <div>
-      <div>
-        <div style={{ marginTop: "100px" }}>
-          <div className="bg-slate-100 flex justify-start items-center  h-8 sm:h-16 w-30 sm:w-48  p-3 mb-2 rounded-lg">
-            <img
-              src={data.companyLogo}
-              alt="CompanyLogo"
-              className="h-auto w-auto "
-            />
-          </div>
-
-          <div>{/*Render here dates*/}</div>
+    <div className="p-8 bg-white w-[910px] absolute top-[30px] right-64 ">
+      {/* Logo and Admin seection */}
+      <div className=" flex justify-between mb-12 ">
+        <div className="w-[43%] mr-20 ">
+          <img
+            src={data.companyLogo}
+            alt="CompanyLogo"
+            className="h-auto w-auto "
+          />
         </div>
-        <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-800 bg-opacity-50 shadow-lg dark:shadow-slate-800 sm:p-2 ">
-          <div className="w-1/2 ">
-            {data ? (
-              <div className="text-black dark:text-colorLightFont p-4">
-                <div className=" text-black dark:text-colorLightFont">
-                  <h3 className=" text-sm sm:text-sm mt-6 font-semibold ">
-                    {data.companyName}
-                  </h3>
-                  <p className="my-2">
-                    <b>Gstin: </b>
-                    {data.gistin}
-                  </p>
-                  <div className="text-black dark:text-colorLightFont opacity-70 flex flex-col justify-start gap-1">
-                    <p>{data.address ? data.address.street : null}</p>
-                    <p>
-                      {data.address
-                        ? data.address.city + data.address.state
-                        : null}
-                    </p>
-                    <p>
-                      {data.address
-                        ? data.address.postalCode + " -" + data.address.country
-                        : null}
-                    </p>
-                    <b>
-                      <b>Contact: </b>
-                      {data.contactNo}
-                    </b>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              "Loding..."
-            )}
-          </div>
-          <div className=" border-l border-l-slate-400 ">
-            {clientObj && selectedClient.loading !== "idle" ? (
-              <div className="text-black ml-0.5 sm:ml-4 dark:text-colorLightFont p-4">
-                <div className=" text-black dark:text-colorLightFont">
-                  <h2 className=" text-sm sm:text-lg my-2 font-semibold">
-                    {clientObj.clientName}
-                  </h2>
-                  <p className="mt-2">
-                    <b>Gstin: </b>
-                    {clientObj.gistin}
-                  </p>
-                  <p className="mb-2">
-                    <b>Pancard: </b>
-                    {clientObj.pancardNo}
-                  </p>
-
-                  <div className="text-black dark:text-colorLightFont opacity-70 flex flex-col justify-start gap-1 ">
-                    <p>{clientObj.address ? clientObj.address.street : null}</p>
-                    <p>
-                      {clientObj.address
-                        ? clientObj.address.city + clientObj.address.state
-                        : null}
-                    </p>
-                    <p>
-                      {clientObj.address
-                        ? clientObj.address.postalCode +
-                          " -" +
-                          clientObj.address.country
-                        : null}
-                    </p>
-                    <p>
-                      <b>Contact: </b>
-                      {clientObj.contactNo}
-                    </p>
-                    <p>
-                      <b>Email: </b>
-                      {clientObj.email}
-                    </p>
-                    <p>
-                      <b>Conversion rate:</b>
-                      {" " + clientObj.conversionRate}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <h4>{null}</h4>
-            )}
+        <div className=" text-black w-[50%]  ">
+          <h3 className=" text-sm  font-semibold ">{data.companyName}</h3>
+          <p className="my-1 text-sm ">
+            <b>Gstin: </b>
+            {data.gistin}
+            <br />
+            <b>Pan: </b>
+            {data.pancardNo}
+          </p>
+          <p className="my-1"></p>
+          <div className="text-black text-sm opacity-70 flex flex-col justify-start ">
+            <p>{data.address.street}</p>
+            <p>
+              {data.address.city +
+                " " +
+                data.address.state +
+                " " +
+                data.address.postalCode +
+                " -" +
+                data.address.country}
+            </p>
+            <p>
+              <span className="text-colorCancelButton font-semibold ">
+                {data.email}
+              </span>
+              {" | " + data.contactNo}
+            </p>
           </div>
         </div>
       </div>
-      <div className=" dark:text-colorLightFont px-8 pb-4 ">
+      {/* Invoivce and Client section */}
+      <div className="flex justify-between mb-8 px-8 pr-0 ">
+        <div>
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
+            Invoice no: {invoiceObject.invoiceNo}
+          </div>
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
+            Bill date: {dayjs(invoiceObject.billDate).format("DD/MM/YYYY")}
+          </div>
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
+            Due date: {dayjs(invoiceObject.dueDate).format("DD/MM/YYYY")}
+          </div>
+        </div>
+        <div className=" text-black w-[50%]  ">
+          <h3 className=" text-sm  font-semibold ">
+            {selectedClient.data.clientName}
+          </h3>
+          <p className="my-1 text-sm ">
+            <b>Gstin: </b>
+            {selectedClient.data.gistin}
+          </p>
+          <p className="my-1"></p>
+          <div className="text-black text-sm opacity-70 flex flex-col justify-start ">
+            <p>{selectedClient.data.address.street}</p>
+            <p>
+              {selectedClient.data.address.city +
+                " " +
+                selectedClient.data.address.state +
+                " " +
+                selectedClient.data.address.postalCode +
+                " -" +
+                selectedClient.data.address.country}
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* Table section */}
+      <div className="px-4 pb-4 ">
         <table className="border-none">
-          <caption className="text-xl font-bold text-center p-4 ">
-            PROJECT DETAILS
-          </caption>
           <thead>
-            <tr className="dark:bg-slate-800 dark:text-colorLightFont ">
-              <th className=" md:flex md:pl-8 ">Sr.no.</th>
+            <tr className=" bg-thirdColor text-white ">
+              <th>Sr.no.</th>
               <th>Project</th>
               <th>Project Period</th>
               <th>Rate</th>
@@ -143,31 +119,33 @@ const DownloadPreview = () => {
             </tr>
           </thead>
           <tbody>
+            <tr className="h-3"></tr>
             {projectsForInvoice?.map((project: any, index: any) => {
               return (
-                <tr
-                  className="dark:bg-slate-800 dark:text-colorLightFont  "
-                  key={project._id}
-                >
-                  <td data-label="Sr.no." className=" md:pl-8 ">
+                <tr className="text-black border bg-white" key={project._id}>
+                  <td data-label="Sr.no." className="border">
                     <label>{index + 1}</label>
                   </td>
-                  <td data-label="Project">
+                  <td className="border" data-label="Project">
                     {project.projectName}
                     <br />
-                    {project.projectManager}
+                    <span className="opacity-70 text-sm">
+                      ({project.projectManager})
+                    </span>
                   </td>
-                  <td data-label="Project Period">
+                  <td className="border" data-label="Project Period">
                     {project.projectPeriod ? (
                       <>
-                        {project.projectPeriod} ({project.workingPeriodType}){" "}
+                        {project.projectPeriod} <br />(
+                        {project.workingPeriodType}){" "}
                       </>
                     ) : (
                       "Hour based project"
                     )}
                   </td>
-                  <td data-label="Rate">
-                    {project.rate}(
+                  <td className="border" data-label="Rate">
+                    {project.rate}
+                    <br />(
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9;</span>
                     ) : project.currencyType === "dollars" ? (
@@ -177,10 +155,11 @@ const DownloadPreview = () => {
                     ) : null}
                     /{project.workingPeriodType})
                   </td>
-                  <td data-label="Working Period">
-                    {project.workingPeriod}({project.workingPeriodType})
+                  <td className="border" data-label="Working Period">
+                    {project.workingPeriod}
+                    <br />({project.workingPeriodType})
                   </td>
-                  <td data-label="Conversion Rate">
+                  <td className="border" data-label="Conversion Rate">
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9; </span>
                     ) : project.currencyType === "dollars" ? (
@@ -190,7 +169,7 @@ const DownloadPreview = () => {
                     ) : null}
                     {project.conversionRate}
                   </td>
-                  <td data-label="Amount">
+                  <td className="border" data-label="Amount">
                     {" "}
                     &#x20B9; {project.amount ? project.amount : 0}
                   </td>
@@ -200,16 +179,17 @@ const DownloadPreview = () => {
           </tbody>
         </table>
       </div>
-      <div>
+      {/* Total bill amount section */}
+      <div className="p-8 flex justify-end">
         <Box
           sx={{
-            minWidth: { xs: "100px", sm: "250px", md: "300px" },
-            padding: "5px",
+            width: "300px",
             mr: "15px",
             pb: { xs: "40px", sm: "15px" },
+            color: "black",
           }}
         >
-          <p className=" text-xl md:text-2xl border-b-2 border-slate-800 border-opacity-70 mb-4 mt-4 md:mt-1 ">
+          <p className=" text-xl border-b-2 p-1 rounded-lg text-white  border-slate-800 border-opacity-70 mb-4 mt-4 bg-thirdColor  ">
             Bill Total
           </p>
           <div className="flex justify-between text-lg md:text-lg">

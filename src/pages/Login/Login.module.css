@@ -43,28 +43,18 @@
   outline: none;
   border-color: rgb(65, 109, 109);
 }
-#loginBtn {
+.loginBtn {
   padding: 8px 20px;
   margin: 20px 0px;
   cursor: pointer;
-  background-color: var(--colorNormalButtonHover);
   color: whitesmoke;
   border: none;
+  background-color: "#7873C9" !important;
+  /* thirdColor: "#7873C9",
+   thirdColorHover: "#6761cc", */
 }
-#loginBtn:hover {
+.loginBtn:hover {
   background-color: #33578a;
-  opacity: 1;
-}
-#logoutBtn {
-  padding: 8px 20px;
-  margin: 20px 0px;
-  cursor: pointer;
-  background-color: rgb(232, 30, 30);
-  color: whitesmoke;
-  border: none;
-}
-#logoutBtn:hover {
-  background-color: rgb(196, 0, 0);
   opacity: 1;
 }
 #forgetPasswordBtn {

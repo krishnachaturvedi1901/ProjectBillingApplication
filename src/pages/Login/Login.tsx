@@ -136,7 +136,10 @@ const Login = () => {
                 </div>
               </div>
               {!isAuth ? (
-                <button id={styles.loginBtn} type="submit">
+                <button
+                  className="bg-thirdColor py-2 px-5 cursor-pointer text-[whitesmoke] border-none hover:bg-colorMediumDark "
+                  type="submit"
+                >
                   Login
                 </button>
               ) : null}
@@ -145,14 +148,12 @@ const Login = () => {
           )}
         </div>
       </div>
-      <div className=" bg-teal-800 dark:bg-slate-800 md:w-2/3 sm:h-40 md:h-auto  text-colorLightFont  p-24 md:text-6xl md:flex justify-start items-center flex-col m-0  ">
+      <div className=" bg-[#989fce] text-colorDarkFont dark:text-colorLightFont dark:bg-slate-800 md:w-2/3 sm:h-40 md:h-auto p-24 md:text-6xl md:flex justify-start items-center flex-col m-0  ">
         <div className="md:flex flex-col gap-8">
           <p>Your</p>
           <p>Personal</p>
           <p>
-            <mark className="p-1 rounded-md bg-colorNormalButtonHover ">
-              Billing
-            </mark>
+            <mark className="p-1 px-8 rounded-md bg-thirdColor ">Billing</mark>
           </p>
           <p>Patner</p>
         </div>

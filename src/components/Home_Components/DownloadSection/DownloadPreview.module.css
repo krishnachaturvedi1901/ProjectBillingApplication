@@ -20,8 +20,12 @@ table tr {
 
 table th,
 table td {
+  border: "1px solid #cecece";
   padding: 0.62em;
   text-align: center;
+}
+table td {
+  border: "1px solid red";
 }
 
 table th {

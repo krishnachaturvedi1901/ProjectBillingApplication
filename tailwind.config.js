@@ -21,6 +21,7 @@ module.exports = {
         colorNormalButtonHover: "#fb8500",
         thirdColor: "#7873C9",
         thirdColorHover: "#6761cc",
+        cubexoThemeColor: "#1bbc9b",
       },
     },
   },
