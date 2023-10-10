@@ -14,9 +14,11 @@ export async function addNewInvoice(invoiceObject: InvoiceType) {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("Res after add invoice-", res.data);
     return res.data;
   } catch (error) {
-    return new Error(`Network error in adding invoive to server ${error}`);
+    console.log("Error after add invoice-", error);
+    return new Error(`Network error in adding invoice to server ${error}`);
   }
 }
 

@@ -4,17 +4,12 @@ import { ThemeContext } from "../../states/context/ThemeContext/ThemeContext";
 import SelectClient from "../../components/Home_Components/ClientSection/SelectClient";
 import ProjectTable from "../../components/Home_Components/ProjectSection/ProjectTable";
 import BillAmount from "../../components/Home_Components/InvoiceSection/BillAmount";
-import DownloadPreview from "../../components/Home_Components/DownloadSection/DownloadPreview";
-
 const Home = () => {
-  // const { windowWidth } = useContext(WindowWidthContext);
-
   return (
     <main className=" bg-slate-200 dark:bg-slate-700 min-h-[150vh] text-colorDarkFont dark:text-colorLightFont  ">
       <SelectClient />
       <ProjectTable />
-      <BillAmount />
-      <DownloadPreview />
+      <BillAmount/>
     </main>
   );
 };

@@ -9,13 +9,17 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../states/redux/store";
+import { AppDispatch, RootState } from "../../../states/redux/store";
 import { useSnackbar } from "notistack";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { updateInvoiceObjectStateAction } from "../../../states/redux/InvoiceProjectState/invoiceObjectState";
+import { useAddInvoiceMutation } from "../../../states/query/Invoice_queries/invoiceQueries";
+import { getAdminByIdAction } from "../../../states/redux/AdminStates/adminSlice";
+import DownloadPreview from "../DownloadSection/DownloadPreview";
+import { Margin, usePDF } from "react-to-pdf";
 const drawerBleeding = 56;
 let windowWidth: number | undefined = window.innerWidth;
 
@@ -53,6 +57,11 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function InvoiceDrawer(props: Props) {
+  const { toPDF, targetRef } = usePDF({
+    filename: "invoice.pdf",
+    page: { margin: Margin.LARGE },
+  });
+
   const materialTheme = useTheme();
   const adminState = useSelector((state: RootState) => state.adminState);
   const selectedClientState = useSelector(
@@ -64,12 +73,19 @@ export default function InvoiceDrawer(props: Props) {
   const [amountAfterTax, setAmountAfterTax] = React.useState(0);
   const [invoiceDate, setInvoiceDate] = React.useState(dayjs());
   const [dueDate, setDueDate] = React.useState(dayjs());
+  const [taxAmount, setTaxAmount] = React.useState(0);
+  const [previewAllowed, setPreviewAllowed] = React.useState(true);
+  const [showPreview, setShowPreview] = React.useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { projectsForInvoice } = useSelector(
     (state: RootState) => state.projectsForInvoiceState
   );
+  const invoiceObject = useSelector(
+    (state: RootState) => state.invoiceObjectState
+  );
+
   const { window } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -80,30 +96,50 @@ export default function InvoiceDrawer(props: Props) {
     }
   }, [adminState, selectedClientState]);
 
+  React.useEffect(() => {
+    dispatch(updateInvoiceObjectStateAction({ invoiceNo }));
+  }, [invoiceNo]);
+
   const handleInvoiceDateChange = (newDate: dayjs.Dayjs | null) => {
-    // Update the invoiceDate state
+    if (!newDate) {
+      enqueueSnackbar("Invalid date select again", {
+        variant: "error",
+      });
+      dispatch(updateInvoiceObjectStateAction({ billDate: "" }));
+      return;
+    }
+
     if (newDate) {
       setInvoiceDate(newDate);
+      const iso8601InvoiceDate = newDate.toISOString();
+      dispatch(
+        updateInvoiceObjectStateAction({ billDate: iso8601InvoiceDate })
+      );
     }
   };
   const handleDueDateChange = (newDate: dayjs.Dayjs | null) => {
-    // Check if the new dueDate is before the invoiceDate
     if (!newDate) {
+      dispatch(updateInvoiceObjectStateAction({ dueDate: "" }));
+
       return console.log("Invalid Date");
     }
     if (newDate.isBefore(invoiceDate)) {
-      // Handle the case where dueDate is before invoiceDate (e.g., show an error message)
-      console.error("Due date cannot be before the invoice date");
+      enqueueSnackbar("Due date cannot be before invoice date.", {
+        variant: "error",
+      });
+      dispatch(updateInvoiceObjectStateAction({ dueDate: "" }));
+
+      return;
     } else {
-      // Update the dueDate state and dispatch the values
       setDueDate(newDate);
-      // Dispatch the updated values to your Redux store or context here
-      // dispatch(updateInvoiceState({ invoiceData: value, dueDate: newDate }));
+      const iso8601DueDate = newDate.toISOString();
+      dispatch(updateInvoiceObjectStateAction({ dueDate: iso8601DueDate }));
     }
   };
-  console.log("Invoce and due date====================>", invoiceDate, dueDate);
+
   const toggleDrawer = (newOpen: boolean) => () => {
     if (projectsForInvoice && projectsForInvoice.length > 0) {
+      setPreviewAllowed(true);
       setOpen(newOpen);
       const projectsIdArr = projectsForInvoice.map((project) => {
         return project._id;
@@ -112,22 +148,30 @@ export default function InvoiceDrawer(props: Props) {
       projectsForInvoice.map((project) => {
         if (project.amount) {
           amountPreTax += project.amount;
+          amountPreTax = +amountPreTax.toFixed(2);
         }
       });
-      let amountPostTax = amountPreTax + (amountPreTax * 18) / 100;
+      let tax = (amountPreTax * 18) / 100;
+      let amountPostTax = +(amountPreTax + tax).toFixed(2);
+      console.log("amount pre and PostTax -", amountPreTax, amountPostTax);
       setAmountWithoutTax(amountPreTax);
       setAmountAfterTax(amountPostTax);
+      setTaxAmount(tax);
 
       const clientId = projectsForInvoice[0].clientId;
       const adminId = projectsForInvoice[0].adminId;
+      setInvoiceNo(+adminState.data.invoiceNo + 1);
+
       dispatch(
         updateInvoiceObjectStateAction({
-          invoiceNo,
+          invoiceNo: invoiceNo,
           projectsId: projectsIdArr,
           clientId,
           adminId,
           amountWithoutTax: amountPreTax,
           amountAfterTax: amountPostTax,
+          billDate: invoiceDate.toISOString(),
+          dueDate: dueDate.toISOString(),
         })
       );
     } else {
@@ -137,7 +181,45 @@ export default function InvoiceDrawer(props: Props) {
     }
   };
 
-  // This is used only for the example
+  function allInvoiceFieldsAvailable(obj: any) {
+    for (const key in obj) {
+      if (obj[key] === "" || obj[key].length <= 0) {
+        return false;
+      }
+      if (obj.dueDate < obj.billDate) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  const AddInvoiceMutationHandler = useAddInvoiceMutation();
+  const handleInvoiceDownload = () => {
+    if (invoiceObject && allInvoiceFieldsAvailable(invoiceObject)) {
+      AddInvoiceMutationHandler.mutate(invoiceObject, {
+        onSuccess: () => {
+          enqueueSnackbar("Download successfull", { variant: "success" });
+          setPreviewAllowed(false);
+          dispatch(getAdminByIdAction(projectsForInvoice[0].adminId));
+          toPDF();
+        },
+        onError: () => {
+          enqueueSnackbar("Network error in download invoice. Try again!", {
+            variant: "error",
+          });
+        },
+      });
+    } else {
+      enqueueSnackbar(
+        "Incomplete invoice details. Please fill invoice date <= due date.",
+        { variant: "error" }
+      );
+    }
+  };
+
+  const previewExecution = (value: boolean) => {
+    setShowPreview(value);
+  };
 
   return (
     <Root>
@@ -145,7 +227,7 @@ export default function InvoiceDrawer(props: Props) {
       <Global
         styles={{
           ".MuiDrawer-root > .MuiPaper-root": {
-            height: `calc(50% - ${drawerBleeding}px)`,
+            height: `calc(52% - ${drawerBleeding}px)`,
             overflow: "visible",
           },
         }}
@@ -153,7 +235,7 @@ export default function InvoiceDrawer(props: Props) {
       <Box
         sx={{
           position: "fixed",
-          top: "89%",
+          top: "88%",
           right: "12%",
           maxWidth: "100px",
           height: "40px",
@@ -189,12 +271,21 @@ export default function InvoiceDrawer(props: Props) {
           }}
         >
           <Puller />
-          <Typography
-            sx={{ p: 2, color: purple[100], fontWeight: "semibold" }}
-            variant="h6"
+          <Box
+            sx={{
+              p: 2,
+              color: purple[100],
+              fontWeight: "semibold",
+              fontSize: "20px",
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: { xs: "flex-start", sm: "space-between" },
+              width: "100%",
+            }}
           >
             Fill invoice required details.
-          </Typography>
+            <span className="mr-8 text-sm">Invoice no.{invoiceNo}</span>
+          </Box>
           <Box
             sx={{
               width: "98%",
@@ -283,15 +374,15 @@ export default function InvoiceDrawer(props: Props) {
                 {clientSameState ? (
                   <>
                     <div className="flex justify-between ">
-                      SGST:<span>"9%"</span>
+                      SGST:(9%)<span>{taxAmount / 2}</span>
                     </div>
                     <div className="flex justify-between ">
-                      CGST:<span>"9%"</span>
+                      CGST:(9%)<span>{taxAmount / 2}</span>
                     </div>
                   </>
                 ) : (
                   <div className="flex justify-between ">
-                    IGST:<span>18%</span>
+                    IGST:(18%)<span>{taxAmount}</span>
                   </div>
                 )}
               </Box>
@@ -328,6 +419,7 @@ export default function InvoiceDrawer(props: Props) {
                 padding: { sm: "10px 25px" },
                 mr: { xs: "3px", sm: "35px", md: "40px" },
               }}
+              onClick={handleInvoiceDownload}
             >
               Download
             </Button>
@@ -342,12 +434,28 @@ export default function InvoiceDrawer(props: Props) {
                 },
                 padding: "10px 25px",
               }}
+              disabled={!previewAllowed}
+              onClick={() => previewExecution(true)}
             >
               Preview
             </Button>
           </Box>
         </StyledBox>
       </SwipeableDrawer>
+      {showPreview ? (
+        <div className="absolute top-14 right-64 w-2/3 p-7 h-auto border border-red-600 bg-slate-600 z-50 ">
+          <div
+            className="fixed top-36 right-60 flex border z-50 cursor-pointer"
+            onClick={() => previewExecution(false)}
+          >
+            Close
+          </div>
+
+          <div ref={targetRef}>
+            <DownloadPreview />
+          </div>
+        </div>
+      ) : null}
     </Root>
   );
 }
