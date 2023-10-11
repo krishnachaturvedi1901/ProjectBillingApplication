@@ -13,14 +13,9 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [logoutExecuted, setLogoutExecuted] = useState(false);
-  const {
-    isAuth,
-    setIsAuth,
-    adminId,
-    setAdminId,
-    setAdminData,
-    logoutAdmin,
-  } = useContext(AuthContext);
+  const [startChangePassword, setStartChangePassword] = useState(false);
+  const { isAuth, setIsAuth, adminId, setAdminId, setAdminData, logoutAdmin } =
+    useContext(AuthContext);
   const [authData, setAuthData] = useState({ email: "", password: "" });
 
   useEffect(() => {
@@ -143,7 +138,12 @@ const Login = () => {
                   Login
                 </button>
               ) : null}
-              <button id={styles.forgetPasswordBtn}>Forget password ?</button>
+              <button
+                onClick={() => setStartChangePassword(true)}
+                id={styles.forgetPasswordBtn}
+              >
+                Forget password ?
+              </button>
             </form>
           )}
         </div>

@@ -1,4 +1,6 @@
 import * as React from "react";
+import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Global } from "@emotion/react";
 import { styled, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -8,8 +10,8 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../states/redux/store";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState, store } from "../../../states/redux/store";
 import { useSnackbar } from "notistack";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
@@ -18,9 +20,13 @@ import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { updateInvoiceObjectStateAction } from "../../../states/redux/InvoiceProjectState/invoiceObjectState";
 import { useAddInvoiceMutation } from "../../../states/query/Invoice_queries/invoiceQueries";
 import { getAdminByIdAction } from "../../../states/redux/AdminStates/adminSlice";
-import DownloadPreview from "../DownloadSection/DownloadPreview";
-import { Margin, usePDF } from "react-to-pdf";
+import generatePDF, { Margin, usePDF } from "react-to-pdf";
 import { RxCross1 } from "react-icons/rx";
+import DownloadPreview2 from "../DownloadSection/DownloadPreview2";
+import DownloadPreview from "../DownloadSection/DownloadPreview";
+import PdfGenerator from "./PdfGenerator";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 const drawerBleeding = 56;
 let windowWidth: number | undefined = window.innerWidth;
 
@@ -72,11 +78,7 @@ export default function InvoiceDrawer(props: Props) {
   const [taxAmount, setTaxAmount] = React.useState(0);
   const [previewAllowed, setPreviewAllowed] = React.useState(true);
   const [showPreview, setShowPreview] = React.useState(false);
-
-  const { toPDF, targetRef } = usePDF({
-    filename: `invoice${invoiceNo}.pdf`,
-    page: { margin: Margin.LARGE },
-  });
+  const [open, setOpen] = React.useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +90,6 @@ export default function InvoiceDrawer(props: Props) {
   );
 
   const { window } = props;
-  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     setInvoiceNo(+adminState.data.invoiceNo + 1);
@@ -100,6 +101,50 @@ export default function InvoiceDrawer(props: Props) {
   React.useEffect(() => {
     dispatch(updateInvoiceObjectStateAction({ invoiceNo }));
   }, [invoiceNo]);
+
+  const { toPDF, targetRef } = usePDF({
+    filename: `invoice${invoiceNo}.pdf`,
+    page: { margin: Margin.SMALL },
+  });
+
+  const generateAndDownloadPDF = async () => {
+    const doc = new jsPDF();
+
+    // Define the content for your PDF
+    // Create a div to render your component
+    const div = document.createElement("div");
+    div.style.width = "1300px";
+    div.style.height = "1000px";
+    document.body.appendChild(div);
+
+    // Render the component to the div
+    const root = createRoot(div);
+    root.render(
+      <Provider store={store}>
+        <DownloadPreview />
+      </Provider>
+    );
+    // Use html2canvas to convert the rendered HTML to a canvas
+    try {
+      const canvas = await html2canvas(div);
+      console.log("canvas============>", canvas);
+      // Convert the canvas to a data URL
+      const imgData = await canvas.toDataURL("image/png");
+
+      console.log("canvas.toDataUrl return=============>", imgData);
+
+      // Add the image to the PDF
+      // doc.addImage(imgData, "PNG", 10, 10);
+
+      // Save the PDF with a specific filename
+      doc.save(`invoice${invoiceNo}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      // Remove the temporary div
+      document.body.removeChild(div);
+    }
+  };
 
   const handleInvoiceDateChange = (newDate: dayjs.Dayjs | null) => {
     if (!newDate) {
@@ -202,7 +247,9 @@ export default function InvoiceDrawer(props: Props) {
           enqueueSnackbar("Download successfull", { variant: "success" });
           setPreviewAllowed(false);
           dispatch(getAdminByIdAction(projectsForInvoice[0].adminId));
-          toPDF();
+          console.log("Before generate pdf");
+          // toPDF();
+          generateAndDownloadPDF();
         },
         onError: () => {
           enqueueSnackbar("Network error in download invoice. Try again!", {
@@ -233,6 +280,7 @@ export default function InvoiceDrawer(props: Props) {
           },
         }}
       />
+      {/* <PdfGenerator ref={targetRef} /> */}
       <Box
         sx={{
           position: "fixed",
@@ -240,7 +288,7 @@ export default function InvoiceDrawer(props: Props) {
           right: "12%",
           maxWidth: "100px",
           height: "40px",
-          zIndex: 60,
+          zIndex: 600,
           color: "white",
         }}
       >
@@ -451,7 +499,6 @@ export default function InvoiceDrawer(props: Props) {
           >
             <RxCross1 size={40} color="black" />
           </div>
-
           <div ref={targetRef}>
             <DownloadPreview />
           </div>

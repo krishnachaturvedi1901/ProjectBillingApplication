@@ -1,13 +1,12 @@
 import React from "react";
 import "./DownloadPreview.module.css";
-import dayjs, { Dayjs } from "dayjs";
-import { Link } from "react-router-dom";
+import dayjs from "dayjs";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../states/redux/store";
 import { ClientType } from "../../../types/types";
 
-const DownloadPreview = () => {
+const DownloadPreview2 = () => {
   const { loading, data, error } = useSelector(
     (state: RootState) => state.adminState
   );
@@ -30,17 +29,17 @@ const DownloadPreview = () => {
   console.log("download executed");
 
   return (
-    <div className="p-8 text-black sm:w-[700px] md:w-[1000px] lg:w-[1200px] xl:w-[1300] bg-white m-auto ">
+    <div className="p-8 bg-white w-[910px] absolute top-[30px] right-64 ">
       {/* Logo and Admin seection */}
       <div className=" flex justify-between mb-12 ">
-        <div className="w-[45%] mr-20 ">
+        <div className="w-[43%] mr-20 ">
           <img
             src={data.companyLogo}
             alt="CompanyLogo"
             className="h-auto w-auto "
           />
         </div>
-        <div className=" text-black w-[40%]  ">
+        <div className=" text-black w-[50%]  ">
           <h3 className=" text-sm  font-semibold ">{data.companyName}</h3>
           <p className="my-1 text-sm ">
             <b>Gstin: </b>
@@ -51,15 +50,15 @@ const DownloadPreview = () => {
           </p>
           <p className="my-1"></p>
           <div className="text-black text-sm opacity-70 flex flex-col justify-start ">
-            <p>{data.address?.street}</p>
+            <p>{data.address.street}</p>
             <p>
-              {data.address?.city +
+              {data.address.city +
                 " " +
-                data.address?.state +
+                data.address.state +
                 " " +
-                data.address?.postalCode +
+                data.address.postalCode +
                 " -" +
-                data.address?.country}
+                data.address.country}
             </p>
             <p>
               <span className="text-colorCancelButton font-semibold ">
@@ -73,17 +72,17 @@ const DownloadPreview = () => {
       {/* Invoivce and Client section */}
       <div className="flex justify-between mb-8 px-8 pr-0 ">
         <div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
             Invoice no: {invoiceObject.invoiceNo}
           </div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
             Bill date: {dayjs(invoiceObject.billDate).format("DD/MM/YYYY")}
           </div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className="text-white bg-thirdColor max-w-fit p-1 rounded-lg mb-1 px-6">
             Due date: {dayjs(invoiceObject.dueDate).format("DD/MM/YYYY")}
           </div>
         </div>
-        <div className=" text-black w-[41%]  ">
+        <div className=" text-black w-[50%]  ">
           <h3 className=" text-sm  font-semibold ">
             {selectedClient.data.clientName}
           </h3>
@@ -93,15 +92,15 @@ const DownloadPreview = () => {
           </p>
           <p className="my-1"></p>
           <div className="text-black text-sm opacity-70 flex flex-col justify-start ">
-            <p>{selectedClient.data.address?.street}</p>
+            <p>{selectedClient.data.address.street}</p>
             <p>
-              {selectedClient.data.address?.city +
+              {selectedClient.data.address.city +
                 " " +
-                selectedClient.data.address?.state +
+                selectedClient.data.address.state +
                 " " +
-                selectedClient.data.address?.postalCode +
+                selectedClient.data.address.postalCode +
                 " -" +
-                selectedClient.data.address?.country}
+                selectedClient.data.address.country}
             </p>
           </div>
         </div>
@@ -223,4 +222,4 @@ const DownloadPreview = () => {
   );
 };
 
-export default DownloadPreview;
+export default DownloadPreview2;
