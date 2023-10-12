@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import "./ProjectTable.module.css";
+import "./ProjectTable.css";
 import CompoAddProject from "./CompoAddProject";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../states/redux/store";
@@ -40,8 +40,6 @@ const ProjectTable = () => {
   const [allChecked, setAllChecked] = useState<boolean>();
   type CheckboxRefType = Array<HTMLInputElement | null>;
   const checkboxesRefs = useRef<CheckboxRefType>([]);
-
-  console.log("Chekboxref--------------------==>", checkboxesRefs);
 
   const handleProjectDelete = (projectId: string) => {
     DeleteProjectMutationHandler.mutate(projectId, {
@@ -108,7 +106,6 @@ const ProjectTable = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     data: ProjectType[]
   ) => {
-    console.log("====allChecked====>", e.target.checked);
     let isAllChecked = e.target.checked;
     setAllChecked(isAllChecked);
 
@@ -131,17 +128,9 @@ const ProjectTable = () => {
     project: ProjectType
   ) => {
     const isChecked = e.target.checked;
-    console.log("single checkbox checked-", isChecked, e.target);
-    // checkboxesRefs.current.forEach((checkboxRef) => {
-    //   if (checkboxRef) {
-    //     checkboxRef.checked = isChecked;
-    //   }
-    // });
-
     const areAllChecked = checkboxesRefs.current.every(
       (checkboxRef) => checkboxRef?.checked === true
     );
-    console.log("areAllChecked)))))))))))))))))))))-->", areAllChecked);
     setAllChecked(areAllChecked);
 
     if (isChecked) {
@@ -161,13 +150,13 @@ const ProjectTable = () => {
         />
       </div>
       <div className=" dark:text-colorLightFont px-8 pb-4 ">
-        <table className="border-none">
-          <caption className="text-xl font-bold text-center p-4 ">
+        <table className="border-none table ">
+          <caption className="text-xl font-bold text-center p-4 bg-white dark:bg-slate-800 caption shadow-md dark:shadow-slate-950 ">
             PROJECT DETAILS
           </caption>
-          <thead>
-            <tr className="dark:bg-slate-800 dark:text-colorLightFont ">
-              <th className=" md:flex md:pl-8 ">
+          <thead className="thead  ">
+            <tr className="dark:bg-slate-800 dark:text-colorLightFont tr ">
+              <th className=" md:flex md:pl-8 th ">
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -184,25 +173,23 @@ const ProjectTable = () => {
                   label="Sr.no."
                 />
               </th>
-              <th>Project</th>
-              <th>Project Period</th>
-              <th>Rate</th>
-              <th>Working Period</th>
-              <th>Conversion Rate</th>
-              <th>Amount</th>
-              <th></th>
+              <th className="th">Project</th>
+              <th className="th">Project Period</th>
+              <th className="th">Rate</th>
+              <th className="th">Working Period</th>
+              <th className="th">Conversion Rate</th>
+              <th className="th">Amount</th>
+              <th className="th"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="shadow-lg dark:shadow-slate-950">
             {data?.map((project: any, index: any) => {
-              // checkboxesRefs.current[index] = useRef<HTMLInputElement>(null);
-
               return (
                 <tr
-                  className="dark:bg-slate-800 dark:text-colorLightFont  "
+                  className="dark:bg-slate-800 dark:text-colorLightFont tr "
                   key={project._id}
                 >
-                  <td data-label="Sr.no." className=" md:flex md:pl-8 ">
+                  <td data-label="Sr.no." className=" md:flex md:pl-8 td ">
                     <div className=" flex justify-end items-center md:justify-start md:w-full md:text-start md:mt-4">
                       <input
                         type="checkbox"
@@ -217,12 +204,12 @@ const ProjectTable = () => {
                       <label>{index + 1}</label>
                     </div>
                   </td>
-                  <td data-label="Project">
+                  <td data-label="Project" className="td">
                     {project.projectName}
                     <br />
                     {project.projectManager}
                   </td>
-                  <td data-label="Project Period">
+                  <td data-label="Project Period" className="td">
                     {project.projectPeriod ? (
                       <>
                         {project.projectPeriod} ({project.workingPeriodType}){" "}
@@ -231,7 +218,7 @@ const ProjectTable = () => {
                       "Hour based project"
                     )}
                   </td>
-                  <td data-label="Rate">
+                  <td data-label="Rate" className="td">
                     {project.rate}(
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9;</span>
@@ -242,10 +229,10 @@ const ProjectTable = () => {
                     ) : null}
                     /{project.workingPeriodType})
                   </td>
-                  <td data-label="Working Period">
+                  <td data-label="Working Period" className="td">
                     {project.workingPeriod}({project.workingPeriodType})
                   </td>
-                  <td data-label="Conversion Rate">
+                  <td data-label="Conversion Rate" className="td">
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9; </span>
                     ) : project.currencyType === "dollars" ? (
@@ -255,11 +242,11 @@ const ProjectTable = () => {
                     ) : null}
                     {project.conversionRate}
                   </td>
-                  <td data-label="Amount">
+                  <td data-label="Amount" className="td">
                     {" "}
                     &#x20B9; {project.amount ? project.amount : 0}
                   </td>
-                  <td>
+                  <td className="td">
                     <div className="h-14 md:h-auto flex  justify-between items-center md:justify-around ">
                       <div>
                         <CompoAddProject

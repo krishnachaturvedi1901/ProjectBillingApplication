@@ -73,12 +73,15 @@ function ConfirmationDialogRaw(props: {
           onChange={(e) => handleChange(e)}
         >
           {clients.map((client) => (
-            <FormControlLabel
-              value={client._id}
-              key={client._id}
-              control={<Radio />}
-              label={client.clientName}
-            />
+            <>
+              <FormControlLabel
+                value={client._id}
+                key={client._id}
+                control={<Radio />}
+                label={client.clientName}
+              />
+              
+            </>
           ))}
         </RadioGroup>
       </DialogContent>
@@ -137,14 +140,7 @@ export default function ConfirmationDialog({
   return (
     <Box>
       <List component="div" role="group">
-        <ListItem
-          button
-          divider
-          aria-haspopup="true"
-          aria-controls="select-client-menu"
-          aria-label="select clients"
-          onClick={handleClickListItem}
-        >
+        <ListItem onClick={handleClickListItem}>
           <Button
             sx={{
               backgroundColor: materialTheme.palette.primary.main,
@@ -156,7 +152,6 @@ export default function ConfirmationDialog({
               "&:hover": {
                 backgroundColor: materialTheme.palette.secondary.main,
               },
-              boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
             }}
           >
             Select Clients

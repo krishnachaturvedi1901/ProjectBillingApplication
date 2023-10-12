@@ -6,6 +6,8 @@ import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../states/redux/store";
 import { ClientType } from "../../../types/types";
+import cubexoLogo from "../../../utils/images/cubexoLogo.webp";
+import gammaedgeLogo from "../../../utils/images/gammaedgeLogo.png";
 
 const DownloadPreview = () => {
   const { loading, data, error } = useSelector(
@@ -28,17 +30,22 @@ const DownloadPreview = () => {
   ).toFixed(2);
 
   console.log("download executed");
-
+  if (data.companyLogo === "https://gammaedge.io/images/logo1.png") {
+  }
   return (
-    <div className="p-8 text-black sm:w-[700px] md:w-[1000px] lg:w-[1200px] xl:w-[1300] bg-white m-auto ">
+    <div className="p-4 text-black w-[793px] bg-white m-auto ">
       {/* Logo and Admin seection */}
-      <div className=" flex justify-between mb-12 ">
-        <div className="w-[45%] mr-20 ">
-          <img
-            src={data.companyLogo}
-            alt="CompanyLogo"
-            className="h-auto w-auto "
-          />
+      <div className=" flex justify-between mb-12">
+        <div className="w-[45%] h-auto mr-16 mt-4 ">
+          {data.companyLogo === "https://gammaedge.io/images/logo1.png" ? (
+            <img
+              src={gammaedgeLogo}
+              alt="gammaedgeLogo"
+              className="h-1/2 w-auto "
+            />
+          ) : (
+            <img src={cubexoLogo} alt="cubexoLogo" className="h-auto w-auto " />
+          )}
         </div>
         <div className=" text-black w-[40%]  ">
           <h3 className=" text-sm  font-semibold ">{data.companyName}</h3>
@@ -73,13 +80,13 @@ const DownloadPreview = () => {
       {/* Invoivce and Client section */}
       <div className="flex justify-between mb-8 px-8 pr-0 ">
         <div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className=" text-white bg-thirdColor  rounded-lg pb-4 mb-1 px-6">
             Invoice no: {invoiceObject.invoiceNo}
           </div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className=" text-white bg-thirdColor  rounded-lg pb-4 mb-1 px-6">
             Bill date: {dayjs(invoiceObject.billDate).format("DD/MM/YYYY")}
           </div>
-          <div className="text-white flex items-center justify-start align-middle bg-thirdColor max-w-fit py-1 rounded-lg mb-1 px-6">
+          <div className=" text-white bg-thirdColor  rounded-lg pb-4 mb-1 px-6">
             Due date: {dayjs(invoiceObject.dueDate).format("DD/MM/YYYY")}
           </div>
         </div>
@@ -125,17 +132,17 @@ const DownloadPreview = () => {
             {projectsForInvoice?.map((project: any, index: any) => {
               return (
                 <tr className="text-black border bg-white" key={project._id}>
-                  <td data-label="Sr.no." className="border">
+                  <td className="border">
                     <label>{index + 1}</label>
                   </td>
-                  <td className="border" data-label="Project">
+                  <td className="border">
                     {project.projectName}
                     <br />
                     <span className="opacity-70 text-sm">
                       ({project.projectManager})
                     </span>
                   </td>
-                  <td className="border" data-label="Project Period">
+                  <td className="border">
                     {project.projectPeriod ? (
                       <>
                         {project.projectPeriod} <br />(
@@ -145,7 +152,7 @@ const DownloadPreview = () => {
                       "Hour based project"
                     )}
                   </td>
-                  <td className="border" data-label="Rate">
+                  <td className="border">
                     {project.rate}
                     <br />(
                     {project.currencyType === "rupees" ? (
@@ -157,11 +164,11 @@ const DownloadPreview = () => {
                     ) : null}
                     /{project.workingPeriodType})
                   </td>
-                  <td className="border" data-label="Working Period">
+                  <td className="border">
                     {project.workingPeriod}
                     <br />({project.workingPeriodType})
                   </td>
-                  <td className="border" data-label="Conversion Rate">
+                  <td className="border">
                     {project.currencyType === "rupees" ? (
                       <span>&#x20B9; </span>
                     ) : project.currencyType === "dollars" ? (
@@ -171,7 +178,7 @@ const DownloadPreview = () => {
                     ) : null}
                     {project.conversionRate}
                   </td>
-                  <td className="border" data-label="Amount">
+                  <td className="border">
                     {" "}
                     &#x20B9; {project.amount ? project.amount : 0}
                   </td>
@@ -191,7 +198,7 @@ const DownloadPreview = () => {
             color: "black",
           }}
         >
-          <p className=" text-xl border-b-2 p-1 rounded-lg text-white  border-slate-800 border-opacity-70 mb-4 mt-4 bg-thirdColor  ">
+          <p className=" text-xl border-b-2 px-2 pr-0 pb-4 rounded-lg text-white  border-slate-800 border-opacity-70 mb-4 mt-4 bg-thirdColor  ">
             Bill Total
           </p>
           <div className="flex justify-between text-lg md:text-lg">

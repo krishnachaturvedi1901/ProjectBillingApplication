@@ -1,5 +1,5 @@
-table {
-  border: 1px solid #ccc;
+.table {
+  /* border: 1px solid #ccc; */
   border-collapse: collapse;
   margin: 0;
   padding: 0;
@@ -7,43 +7,43 @@ table {
   table-layout: fixed;
 }
 
-table caption {
+.caption {
   font-size: 1.5em;
   margin: 0.5em 0 0.75em;
 }
 
-table tr {
+.tr {
   background-color: #f8f8f8;
   border-bottom: 1px solid #969696;
   padding: 0.35em;
 }
 
-table th,
-table td {
+.th,
+.td {
   padding: 0.62em;
   text-align: center;
 }
 
-table th {
+.th {
   border-bottom: 2px solid #969696;
   font-size: 0.85em;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-table tr:last-child {
+.tr:last-child {
   border-bottom: 0;
 }
 
 @media screen and (max-width: 768px) {
-  table {
+  .table {
     border: 0;
   }
 
-  table caption {
+  .caption {
     font-size: 1.3em;
   }
 
-  table thead {
+  .thead {
     border: none;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -54,19 +54,19 @@ table tr:last-child {
     width: 1px;
   }
 
-  table tr {
+  .tr {
     display: block;
     margin-bottom: 0.625em;
   }
 
-  table td {
+  .td {
     border-bottom: 1px solid #969696;
     display: block;
     font-size: 0.8em;
     text-align: right;
   }
 
-  table td::before {
+  .td::before {
     /*
     * aria-label has no advantage, it won't be read inside a table
     content: attr(aria-label);

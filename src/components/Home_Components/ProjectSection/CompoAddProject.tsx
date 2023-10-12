@@ -188,7 +188,7 @@ export default function CompoAddProject({
           onSuccess: () => {
             queryClient.refetchQueries(["projects", clientId]);
             setLoading(false);
-            enqueueSnackbar("Project deleted successfully.", {
+            enqueueSnackbar("Project edited successfully.", {
               variant: "success",
             });
 
@@ -225,6 +225,7 @@ export default function CompoAddProject({
       });
     }
     if (toEdit && projectToEdit) {
+      delete projectToEdit.amount;
       setProjectData(projectToEdit);
     }
   }, [toEdit, forAddProject, projectToEdit, clientId, adminId]);
@@ -308,7 +309,10 @@ export default function CompoAddProject({
       )}
       <div>
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Add Project</DialogTitle>;
+          <DialogTitle>
+            {forAddProject ? "Add Project" : "Edit Project"}
+          </DialogTitle>
+          ;
           {incompleteError.length > 0 ? (
             <Alert severity="error"> {incompleteError}</Alert>
           ) : null}

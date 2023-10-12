@@ -24,9 +24,9 @@ import generatePDF, { Margin, usePDF } from "react-to-pdf";
 import { RxCross1 } from "react-icons/rx";
 import DownloadPreview2 from "../DownloadSection/DownloadPreview2";
 import DownloadPreview from "../DownloadSection/DownloadPreview";
-import PdfGenerator from "./PdfGenerator";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { ThemeContext } from "../../../states/context/ThemeContext/ThemeContext";
 const drawerBleeding = 56;
 let windowWidth: number | undefined = window.innerWidth;
 
@@ -42,14 +42,14 @@ const Root = styled("div")(({ theme }) => {
   const materialTheme = useTheme();
   return {
     height: "100%",
-    backgroundColor: materialTheme.palette.secondary.main,
+    backgroundColor: deepPurple[300],
   };
 });
 
 const StyledBox = styled(Box)(({ theme }) => {
   const materialTheme = useTheme();
   return {
-    backgroundColor: materialTheme.palette.primary.main,
+    // backgroundColor: "whitesmoke",
   };
 });
 
@@ -63,8 +63,9 @@ const Puller = styled(Box)(({ theme }) => ({
   left: "calc(50% - 15px)",
 }));
 
-export default function InvoiceDrawer(props: Props) {
+export default function InvoiceDrawer() {
   const materialTheme = useTheme();
+  const { visibility } = React.useContext(ThemeContext);
   const adminState = useSelector((state: RootState) => state.adminState);
   const selectedClientState = useSelector(
     (state: RootState) => state.selectedClientState
@@ -79,6 +80,13 @@ export default function InvoiceDrawer(props: Props) {
   const [previewAllowed, setPreviewAllowed] = React.useState(true);
   const [showPreview, setShowPreview] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [tempImgData, setTempImgData] = React.useState("");
+  const [allowDownload, setAllowDownload] = React.useState(true);
+  const [bgColorHeadStyledBox, setBgColorHeadStyledBox] =
+    React.useState("#151e2d");
+  const [bgColorBodyStyledBox, setBgColorBodyStyledBox] =
+    React.useState("#334155");
+  const [textColor, setTextColor] = React.useState("whitesmoke");
 
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch<AppDispatch>();
@@ -88,8 +96,6 @@ export default function InvoiceDrawer(props: Props) {
   const invoiceObject = useSelector(
     (state: RootState) => state.invoiceObjectState
   );
-
-  const { window } = props;
 
   React.useEffect(() => {
     setInvoiceNo(+adminState.data.invoiceNo + 1);
@@ -102,10 +108,17 @@ export default function InvoiceDrawer(props: Props) {
     dispatch(updateInvoiceObjectStateAction({ invoiceNo }));
   }, [invoiceNo]);
 
-  const { toPDF, targetRef } = usePDF({
-    filename: `invoice${invoiceNo}.pdf`,
-    page: { margin: Margin.SMALL },
-  });
+  React.useEffect(() => {
+    if (visibility) {
+      setBgColorHeadStyledBox(materialTheme.palette.primary.main);
+      setBgColorBodyStyledBox("whitesmoke");
+      setTextColor("black");
+    } else {
+      setBgColorHeadStyledBox("#151e2d");
+      setBgColorBodyStyledBox("#334155");
+      setTextColor("whitesmoke");
+    }
+  }, [visibility]);
 
   const generateAndDownloadPDF = async () => {
     const doc = new jsPDF();
@@ -113,37 +126,74 @@ export default function InvoiceDrawer(props: Props) {
     // Define the content for your PDF
     // Create a div to render your component
     const div = document.createElement("div");
-    div.style.width = "1300px";
-    div.style.height = "1000px";
+    div.style.width = "793px";
+    div.style.height = "1124px";
     document.body.appendChild(div);
 
-    // Render the component to the div
     const root = createRoot(div);
-    root.render(
-      <Provider store={store}>
-        <DownloadPreview />
-      </Provider>
+    await root.render(
+      <div>
+        <Provider store={store}>
+          <DownloadPreview />
+        </Provider>
+      </div>
     );
-    // Use html2canvas to convert the rendered HTML to a canvas
-    try {
-      const canvas = await html2canvas(div);
-      console.log("canvas============>", canvas);
-      // Convert the canvas to a data URL
-      const imgData = await canvas.toDataURL("image/png");
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(div);
+        const imgData = await canvas.toDataURL("image/png");
+        const imgOptions = {
+          imageData: imgData,
+          x: 5,
+          y: 5,
+          width: 200,
+          height: 230,
+          resolution: 96,
+        };
 
-      console.log("canvas.toDataUrl return=============>", imgData);
+        // Add the image to the PDF
+        doc.addImage(imgOptions);
 
-      // Add the image to the PDF
-      // doc.addImage(imgData, "PNG", 10, 10);
+        // Save the PDF with a specific filename
+        doc.save(`invoice${invoiceNo}.pdf`);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      } finally {
+        // Remove the temporary div
+        document.body.removeChild(div);
+        setAllowDownload(true);
+      }
+    }, 1000);
+  };
 
-      // Save the PDF with a specific filename
-      doc.save(`invoice${invoiceNo}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      // Remove the temporary div
-      document.body.removeChild(div);
-    }
+  const generateAndPreviewPDF = async () => {
+    // Define the content for your PDF
+    // Create a div to render your component
+    const div = document.createElement("div");
+    div.style.width = "793px";
+    div.style.height = "1124px";
+    document.body.appendChild(div);
+
+    const root = createRoot(div);
+    await root.render(
+      <div>
+        <Provider store={store}>
+          <DownloadPreview />
+        </Provider>
+      </div>
+    );
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(div);
+        const imgData = await canvas.toDataURL("image/png");
+        setTempImgData(imgData);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      } finally {
+        // Remove the temporary div
+        document.body.removeChild(div);
+      }
+    }, 1000);
   };
 
   const handleInvoiceDateChange = (newDate: dayjs.Dayjs | null) => {
@@ -185,6 +235,7 @@ export default function InvoiceDrawer(props: Props) {
 
   const toggleDrawer = (newOpen: boolean) => () => {
     if (projectsForInvoice && projectsForInvoice.length > 0) {
+      generateAndPreviewPDF();
       setPreviewAllowed(true);
       setOpen(newOpen);
       const projectsIdArr = projectsForInvoice.map((project) => {
@@ -241,20 +292,23 @@ export default function InvoiceDrawer(props: Props) {
 
   const AddInvoiceMutationHandler = useAddInvoiceMutation();
   const handleInvoiceDownload = () => {
+    setAllowDownload(false);
     if (invoiceObject && allInvoiceFieldsAvailable(invoiceObject)) {
       AddInvoiceMutationHandler.mutate(invoiceObject, {
         onSuccess: () => {
           enqueueSnackbar("Download successfull", { variant: "success" });
           setPreviewAllowed(false);
           dispatch(getAdminByIdAction(projectsForInvoice[0].adminId));
-          console.log("Before generate pdf");
-          // toPDF();
           generateAndDownloadPDF();
         },
         onError: () => {
-          enqueueSnackbar("Network error in download invoice. Try again!", {
-            variant: "error",
-          });
+          setAllowDownload(true);
+          enqueueSnackbar(
+            "Network error in save and download invoice. Try again!",
+            {
+              variant: "error",
+            }
+          );
         },
       });
     } else {
@@ -266,6 +320,7 @@ export default function InvoiceDrawer(props: Props) {
   };
 
   const previewExecution = (value: boolean) => {
+    if (value) setOpen(false);
     setShowPreview(value);
   };
 
@@ -284,7 +339,7 @@ export default function InvoiceDrawer(props: Props) {
       <Box
         sx={{
           position: "fixed",
-          top: "88%",
+          bottom: "8%",
           right: "12%",
           maxWidth: "100px",
           height: "40px",
@@ -316,14 +371,14 @@ export default function InvoiceDrawer(props: Props) {
             visibility: "visible",
             right: 0,
             left: 0,
-            bgcolor: deepPurple[700],
+            bgcolor: bgColorHeadStyledBox,
           }}
         >
           <Puller />
           <Box
             sx={{
               p: 2,
-              color: purple[100],
+              color: "white",
               fontWeight: "semibold",
               fontSize: "20px",
               display: "flex",
@@ -335,14 +390,14 @@ export default function InvoiceDrawer(props: Props) {
             Fill invoice required details.
             <span className="mr-8 text-sm">Invoice no.{invoiceNo}</span>
           </Box>
-          <Box
+          {/* <Box
             sx={{
               width: "98%",
               borderBottom: "1px solid",
               borderColor: deepPurple[900],
               m: "auto",
             }}
-          ></Box>
+          ></Box> */}
         </StyledBox>
         <StyledBox
           sx={{
@@ -350,6 +405,7 @@ export default function InvoiceDrawer(props: Props) {
             pb: 2,
             height: "100%",
             overflow: "auto",
+            bgcolor: bgColorBodyStyledBox,
           }}
         >
           <Box
@@ -367,6 +423,7 @@ export default function InvoiceDrawer(props: Props) {
                 flexDirection: "column",
                 gap: "10px",
                 pt: "10px",
+                color: "whitesmoke",
               }}
             >
               {windowWidth && windowWidth > 768 ? (
@@ -376,6 +433,7 @@ export default function InvoiceDrawer(props: Props) {
                       defaultValue={invoiceDate}
                       onChange={(newDate) => handleInvoiceDateChange(newDate)}
                       format="DD/MM/YYYY"
+                      className="text-black dark:text-white"
                     />
                   </DemoItem>
                   <DemoItem label="Due date">
@@ -383,6 +441,7 @@ export default function InvoiceDrawer(props: Props) {
                       defaultValue={dueDate}
                       onChange={(newDate) => handleDueDateChange(newDate)}
                       format="DD/MM/YYYY"
+                      sx={{ color: textColor }}
                     />
                   </DemoItem>
                 </>
@@ -411,6 +470,7 @@ export default function InvoiceDrawer(props: Props) {
                 padding: "5px",
                 mr: "15px",
                 pb: { xs: "40px", sm: "15px" },
+                color: textColor,
               }}
             >
               <p className=" text-xl md:text-2xl border-b-2 border-slate-800 border-opacity-70 mb-4 mt-4 md:mt-1 ">
@@ -460,15 +520,16 @@ export default function InvoiceDrawer(props: Props) {
             <Button
               sx={{
                 width: { xs: "50%", sm: "150px" },
-                backgroundColor: deepPurple[700],
-                color: purple[100],
+                backgroundColor: materialTheme.palette.primary.main,
+                color: "white",
                 ":hover": {
-                  backgroundColor: deepPurple[800],
+                  backgroundColor: materialTheme.palette.secondary.main,
                 },
                 padding: { sm: "10px 25px" },
                 mr: { xs: "3px", sm: "35px", md: "40px" },
               }}
               onClick={handleInvoiceDownload}
+              disabled={!allowDownload}
             >
               Download
             </Button>
@@ -476,10 +537,10 @@ export default function InvoiceDrawer(props: Props) {
               sx={{
                 width: { xs: "50%", sm: "150px" },
 
-                backgroundColor: deepPurple[700],
-                color: purple[100],
+                backgroundColor: materialTheme.palette.primary.main,
+                color: "white",
                 ":hover": {
-                  backgroundColor: deepPurple[800],
+                  backgroundColor: materialTheme.palette.secondary.main,
                 },
                 padding: "10px 25px",
               }}
@@ -499,8 +560,13 @@ export default function InvoiceDrawer(props: Props) {
           >
             <RxCross1 size={40} color="black" />
           </div>
-          <div ref={targetRef}>
-            <DownloadPreview />
+          <div className="m-auto w-full h-full flex justify-center items-start pt-16 ">
+            {/* <DownloadPreview /> */}
+            {tempImgData.length > 0 ? (
+              <img src={tempImgData} alt="invoice" />
+            ) : (
+              <h1>Error preview again!</h1>
+            )}
           </div>
         </div>
       ) : null}
