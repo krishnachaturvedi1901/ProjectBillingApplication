@@ -19,6 +19,7 @@ import { AppDispatch } from "../../../states/redux/store";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import { removeAllProjectsFromInvoiceAction } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
 import { useTheme } from "@mui/material";
+import { deleteClientAction } from "../../../states/redux/ClientStates/deleteClientSlice";
 
 function ConfirmationDialogRaw(props: {
   onClose: (newValue: string) => void;
@@ -28,6 +29,7 @@ function ConfirmationDialogRaw(props: {
   keepMounted: boolean;
   clients: ClientType[];
 }) {
+  const dispatch = useDispatch<AppDispatch>();
   const { onClose, value: valueProp, open, clients, ...other } = props;
   const [value, setValue] = React.useState(valueProp);
   const radioGroupRef = React.useRef(null);
@@ -55,6 +57,13 @@ function ConfirmationDialogRaw(props: {
     setValue(event.target.value);
   };
 
+  const handleEditClient = (client: ClientType) => {};
+
+  const handleDeleteClient = (clientId: string | undefined) => {
+    if (clientId) {
+      dispatch(deleteClientAction(clientId));
+    }
+  };
   return (
     <Dialog
       sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 435 } }}
@@ -73,15 +82,29 @@ function ConfirmationDialogRaw(props: {
           onChange={(e) => handleChange(e)}
         >
           {clients.map((client) => (
-            <>
+            <div className="flex justify-between items-center">
               <FormControlLabel
                 value={client._id}
                 key={client._id}
                 control={<Radio />}
                 label={client.clientName}
+                sx={{
+                  width: "50%",
+                }}
               />
-              
-            </>
+              <div
+                className="cursor-pointer"
+                onClick={() => handleEditClient(client)}
+              >
+                Edit
+              </div>
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteClient(client._id)}
+              >
+                Delete
+              </div>
+            </div>
           ))}
         </RadioGroup>
       </DialogContent>
