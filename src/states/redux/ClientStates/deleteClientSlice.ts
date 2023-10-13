@@ -15,15 +15,15 @@ export const deleteClientAction = createAsyncThunk(
 );
 
 interface deleteClientStateType {
-  loading: "idle" | "pending" | "succeeded" | "failed";
-  data: ClientType;
-  error: string | null;
+  deleteLoading: "idle" | "pending" | "succeeded" | "failed";
+  deleteData: ClientType;
+  deleteError: string | null;
 }
 
 const initialState: deleteClientStateType = {
-  loading: "idle",
-  data: {} as ClientType,
-  error: null,
+  deleteLoading: "idle",
+  deleteData: {} as ClientType,
+  deleteError: null,
 };
 
 const deleteClientSlice = createSlice({
@@ -33,16 +33,16 @@ const deleteClientSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(deleteClientAction.pending, (state, action) => {
-        state.loading = "pending";
+        state.deleteLoading = "pending";
       })
       .addCase(deleteClientAction.fulfilled, (state, action) => {
-        state.loading = "succeeded";
-        state.data = action.payload;
+        state.deleteLoading = "succeeded";
+        state.deleteData = action.payload;
       })
       .addCase(deleteClientAction.rejected, (state, action) => {
-        state.loading = "failed";
-        state.data = {} as ClientType;
-        state.error = action.payload as string;
+        state.deleteLoading = "failed";
+        state.deleteData = {} as ClientType;
+        state.deleteError = action.payload as string;
       });
   },
 });

@@ -13,13 +13,17 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { ClientType } from "../../../types/types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
-import { AppDispatch } from "../../../states/redux/store";
+import { AppDispatch, RootState } from "../../../states/redux/store";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import { removeAllProjectsFromInvoiceAction } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
-import { useTheme } from "@mui/material";
+import { CircularProgress, useTheme } from "@mui/material";
 import { deleteClientAction } from "../../../states/redux/ClientStates/deleteClientSlice";
+import { MdOutlineDeleteSweep } from "react-icons/md";
+import { enqueueSnackbar } from "notistack";
+import CompoLoading from "./Compo-Loding";
+import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
 
 function ConfirmationDialogRaw(props: {
   onClose: (newValue: string) => void;
@@ -27,18 +31,49 @@ function ConfirmationDialogRaw(props: {
   value: string;
   id: string; // Add the id prop here
   keepMounted: boolean;
-  clients: ClientType[];
+  adminId: string | null;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { onClose, value: valueProp, open, clients, ...other } = props;
+  const { onClose, value: valueProp, open, adminId, ...other } = props;
   const [value, setValue] = React.useState(valueProp);
   const radioGroupRef = React.useRef(null);
+  const { deleteLoading, deleteData, deleteError } = useSelector(
+    (state: RootState) => state.deleteClientState
+  );
+  const {
+    loading: clientsLoading,
+    data: clients,
+    error: clientsError,
+  } = useSelector((state: RootState) => state.allClientsState);
+
+  console.log(
+    "====================================================================>",
+    clients
+  );
 
   React.useEffect(() => {
     if (!open) {
       setValue(valueProp);
     }
   }, [valueProp, open]);
+
+  React.useEffect(() => {
+    console.log("deleteState=====>", deleteLoading, deleteData, deleteError);
+    if (deleteLoading === "succeeded" && deleteData) {
+      if (adminId) {
+        dispatch(getAllClientsByAdminIdAction(adminId));
+      }
+      enqueueSnackbar({
+        message: "Client deleted successfully",
+        variant: "success",
+      });
+    } else if (deleteLoading === "failed") {
+      enqueueSnackbar({
+        message: "Error in deleting client",
+        variant: "error",
+      });
+    }
+  }, [deleteLoading, deleteError]);
 
   const handleEntering = () => {
     if (radioGroupRef.current != null) {
@@ -72,41 +107,51 @@ function ConfirmationDialogRaw(props: {
       open={open}
       {...other}
     >
-      <DialogTitle>Select</DialogTitle>
+      <DialogTitle>Select Client</DialogTitle>
       <DialogContent dividers>
-        <RadioGroup
-          ref={radioGroupRef}
-          aria-label="clients"
-          name="clients"
-          value={value}
-          onChange={(e) => handleChange(e)}
-        >
-          {clients.map((client) => (
-            <div className="flex justify-between items-center">
-              <FormControlLabel
-                value={client._id}
-                key={client._id}
-                control={<Radio />}
-                label={client.clientName}
-                sx={{
-                  width: "50%",
-                }}
-              />
-              <div
-                className="cursor-pointer"
-                onClick={() => handleEditClient(client)}
-              >
-                Edit
+        {clientsLoading === "pending" ? (
+          <CompoLoading forAllClients={true} forSelectClient={false} />
+        ) : (
+          <RadioGroup
+            ref={radioGroupRef}
+            aria-label="clients"
+            name="clients"
+            value={value}
+            onChange={(e) => handleChange(e)}
+          >
+            {clients.map((client) => (
+              <div className="flex justify-between items-center">
+                <FormControlLabel
+                  value={client._id}
+                  control={<Radio />}
+                  label={client.clientName}
+                  sx={{
+                    width: "50%",
+                  }}
+                />
+                <div
+                  className="cursor-pointer"
+                  onClick={() => handleEditClient(client)}
+                >
+                  Edit
+                </div>
+                {deleteLoading === "pending" ? (
+                  <CircularProgress size={25} />
+                ) : (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleDeleteClient(client._id)}
+                  >
+                    <MdOutlineDeleteSweep
+                      size={25}
+                      className="text-thirdColor hover:text-violet-600 "
+                    />
+                  </div>
+                )}
               </div>
-              <div
-                className="cursor-pointer"
-                onClick={() => handleDeleteClient(client._id)}
-              >
-                Delete
-              </div>
-            </div>
-          ))}
-        </RadioGroup>
+            ))}
+          </RadioGroup>
+        )}
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleCancel}>
@@ -124,17 +169,12 @@ ConfirmationDialogRaw.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-export default function ConfirmationDialog({
-  clientsArr,
-  adminId,
-}: {
-  clientsArr: ClientType[];
-  adminId: string | null;
-}) {
+export default function ConfirmationDialog({}: {}) {
   const materialTheme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
+  const { adminId } = React.useContext(AuthContext);
   React.useEffect(() => {
     if (value.length > 0) {
       dispatch(getClientByIdAction(value));
@@ -143,7 +183,7 @@ export default function ConfirmationDialog({
   }, [value, dispatch]);
 
   React.useEffect(() => {
-    if (adminId && clientsArr.length === 0) {
+    if (adminId) {
       dispatch(getAllClientsByAdminIdAction(adminId));
     }
   }, [adminId, dispatch]);
@@ -186,7 +226,7 @@ export default function ConfirmationDialog({
           open={open}
           onClose={handleClose}
           value={value}
-          clients={clientsArr}
+          adminId={adminId}
         />
       </List>
     </Box>

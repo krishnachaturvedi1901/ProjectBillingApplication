@@ -15,6 +15,9 @@ export interface AdminType {
   contactNo: string;
   pancardNo: string;
   invoiceNo: number;
+  accountNo: string;
+  ifsc: string;
+  bank: string;
 }
 export interface ClientType {
   _id?: string;

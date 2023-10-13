@@ -7,9 +7,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
-import { useDispatch } from "react-redux"; // Assuming you're using Redux
+import { useDispatch, useSelector } from "react-redux"; // Assuming you're using Redux
 import { addNewClientAction } from "../../../states/redux/ClientStates/addClientSlice";
-import { AppDispatch } from "../../../states/redux/store";
+import { AppDispatch, RootState } from "../../../states/redux/store";
 import {
   CityInfoType,
   ClientType,
@@ -17,19 +17,25 @@ import {
   StateInfoType,
 } from "../../../types/types";
 import SelectCountryStateCity from "./Compo_CountrySelect";
-import { Alert, Typography, useTheme } from "@mui/material";
+import { Alert, LinearProgress, Typography, useTheme } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
+import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
 
-export default function CompoAddClient({
-  open,
-  handleClickOpen,
-  handleClose,
-  user,
-}: {
-  open: boolean;
-  handleClickOpen: () => void;
-  handleClose: () => void;
-  user: string;
-}) {
+export default function CompoAddClient() {
+  const { adminId } = React.useContext(AuthContext);
+  //--------------------------------------------------------
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  // -------------------------------------------------------
+
   const materialTheme = useTheme();
   const [selectedCountry, setSelectedCountry] = useState<CountryInfoType>(
     {} as CountryInfoType
@@ -45,6 +51,12 @@ export default function CompoAddClient({
 
   console.log("country", selectedCountry.name);
   const dispatch = useDispatch<AppDispatch>();
+  const {
+    loading: addClientLoading,
+    data: addedClient,
+    error: addClientError,
+  } = useSelector((state: RootState) => state.addClientState);
+
   const [clientData, setClientData] = useState<ClientType>({
     clientName: "",
     email: "",
@@ -59,9 +71,37 @@ export default function CompoAddClient({
       country: selectedCity.name,
       postalCode: "",
     },
-    user: user,
+    user: "",
   });
   console.log("ClientData", clientData);
+
+  React.useEffect(() => {
+    if (adminId) {
+      setClientData({ ...clientData, user: adminId });
+    }
+  }, [adminId]);
+
+  React.useEffect(() => {
+    console.log(
+      "Added client state======>",
+      addClientLoading,
+      addedClient,
+      addClientError
+    );
+    if (addClientLoading === "succeeded" && addedClient._id) {
+      enqueueSnackbar({
+        message: "Client add successfully",
+        variant: "success",
+      });
+      handleClose();
+    } else if (addClientLoading === "failed") {
+      setFormError("Network error try again!");
+      enqueueSnackbar({
+        message: "Error in adding client.Try again!",
+        variant: "error",
+      });
+    }
+  }, [addClientError, addClientLoading, addedClient]);
 
   React.useEffect(() => {
     setClientData({
@@ -72,8 +112,12 @@ export default function CompoAddClient({
         state: selectedState.name,
         city: selectedCity.name,
       },
-      user: user,
     });
+    if (adminId) {
+      setClientData((prev) => {
+        return { ...prev, user: adminId };
+      });
+    }
   }, [selectedCountry, selectedState, selectedCity]);
 
   const handleChange = (
@@ -135,7 +179,6 @@ export default function CompoAddClient({
   const handleSubmit = () => {
     if (areAllFieldsFilled(clientData) && areEntriesValid(clientData)) {
       dispatch(addNewClientAction(clientData));
-      handleClose();
     } else {
       setIncompleteError("Incomplete fields");
     }
@@ -162,6 +205,7 @@ export default function CompoAddClient({
         ) : incompleteError.length > 0 ? (
           <Alert severity="error"> {incompleteError}</Alert>
         ) : null}
+        {addClientLoading === "pending" ? <LinearProgress /> : null}
         <DialogContent>
           <TextField
             autoFocus

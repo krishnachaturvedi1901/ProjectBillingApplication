@@ -22,6 +22,7 @@ module.exports = {
         thirdColor: "#7873C9",
         thirdColorHover: "#6761cc",
         cubexoThemeColor: "#1bbc9b",
+        colorPdf: "#5a51be",
       },
     },
   },

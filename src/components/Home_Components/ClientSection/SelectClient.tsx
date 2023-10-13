@@ -8,22 +8,12 @@ import ConfirmationDialog from "./Compo-ClientDialogeBox";
 import { ClientType } from "../../../types/types";
 import CompoLoading from "./Compo-Loding";
 import CompoAddClient from "./Compo_AddClient";
+import cubexoLogo from "../../../utils/images/cubexoLogo.webp";
+import gamaedgeLogo from "../../../utils/images/gammaedgeLogo.png";
 
 const SelectClient = () => {
   const { isAuth, adminId } = useContext(AuthContext);
-  const [companyLogo, setCompanyLogo] = useState("");
-  //--------------------------------------------------------
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // -------------------------------------------------------
+  const [companyLogo, setCompanyLogo] = useState<string>();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, data, error } = useSelector(
     (state: RootState) => state.adminState
@@ -37,16 +27,17 @@ const SelectClient = () => {
   );
   console.log("selectedClient-", selectedClient);
   // -------------------------------------------------------
-
+  // "https://gammaedge.io/images/logo1.png";
+  // "https://www.cubexo.io/images/Logo.webp";
   useEffect(() => {
     if (
       loading === "succeeded" &&
       adminId &&
       adminId === "6516a4ba98fd8b5ed365d5f4"
     ) {
-      setCompanyLogo("https://gammaedge.io/images/logo1.png");
+      setCompanyLogo(gamaedgeLogo);
     } else if (loading === "succeeded" && adminId) {
-      setCompanyLogo("https://www.cubexo.io/images/Logo.webp");
+      setCompanyLogo(cubexoLogo);
     }
   }, [loading, data, adminId]);
 
@@ -90,7 +81,7 @@ const SelectClient = () => {
     selectedClient.loading === "pending" ||
     addedNewClientState.loading === "pending"
   ) {
-    return <CompoLoading />;
+    return <CompoLoading forAllClients={false} forSelectClient={true} />;
   } else if (error || selectedClient.error) {
     return (
       <h3>
@@ -115,15 +106,10 @@ const SelectClient = () => {
     <section>
       <div className="flex justify-around sm:justify-end items-center pr-4 pt-6 sm:pr-8 sticky top-16 bg-slate-200 dark:bg-slate-700 z-10 ">
         <div>
-          <ConfirmationDialog clientsArr={clientsArr} adminId={adminId} />
+          <ConfirmationDialog />
         </div>
         <div>
-          <CompoAddClient
-            open={open}
-            handleClickOpen={handleClickOpen}
-            handleClose={handleClose}
-            user={adminId!}
-          />
+          <CompoAddClient />
         </div>
       </div>
       <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-800 bg-opacity-50 shadow-lg dark:shadow-slate-950 sm:p-2 ">

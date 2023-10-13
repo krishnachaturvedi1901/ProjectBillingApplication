@@ -126,7 +126,7 @@ export default function InvoiceDrawer() {
     // Define the content for your PDF
     // Create a div to render your component
     const div = document.createElement("div");
-    div.style.width = "793px";
+    div.style.width = "1050px"; /*put 793 for a4 size*/
     div.style.height = "1124px";
     document.body.appendChild(div);
 
@@ -170,8 +170,8 @@ export default function InvoiceDrawer() {
     // Define the content for your PDF
     // Create a div to render your component
     const div = document.createElement("div");
-    div.style.width = "793px";
-    div.style.height = "1124px";
+    div.style.width = "1050px";
+    div.style.height = "1000px";
     document.body.appendChild(div);
 
     const root = createRoot(div);
@@ -555,12 +555,12 @@ export default function InvoiceDrawer() {
       {showPreview ? (
         <div className="w-screen h-[1200px] absolute top-[0px] right-[0] z-[100] bg-[#989fce] bg-opacity-80 ">
           <div
-            className="fixed top-[20px] right-[20px] flex  z-50 cursor-pointer hover:bg-inherit"
+            className="fixed top-[25px] right-[20px] flex  z-50 cursor-pointer hover:bg-inherit"
             onClick={() => previewExecution(false)}
           >
             <RxCross1 size={40} color="black" />
           </div>
-          <div className="m-auto w-full h-full flex justify-center items-start pt-16 ">
+          <div className="m-auto w-full h-full flex justify-center items-start pt-0 ">
             {/* <DownloadPreview /> */}
             {tempImgData.length > 0 ? (
               <img src={tempImgData} alt="invoice" />
