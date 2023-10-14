@@ -7,6 +7,7 @@
   text-align: start;
   margin-right: 10px;
   max-width: 80%;
+  text-align: left;
 }
 .loginDiv > p {
   margin-bottom: 15px;
@@ -58,12 +59,9 @@
   opacity: 1;
 }
 #forgetPasswordBtn {
-  padding: 8px 20px;
-  margin: 20px 0px;
+  padding: 8px 0px;
   cursor: pointer;
-  border: none;
   background: none;
-  margin: 0 20px;
   color: var(--colorDark);
 }
 #forgetPasswordBtn:hover {
