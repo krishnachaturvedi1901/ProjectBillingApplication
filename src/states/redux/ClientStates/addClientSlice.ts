@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  SliceCaseReducers,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { addClient } from "../../../api/client_requests";
 import { ClientType } from "../../../types/types";
 
@@ -26,7 +30,10 @@ const addClientInitialState: ClientStateType = {
   error: null,
 };
 
-const addClientSlice = createSlice({
+const addClientSlice = createSlice<
+  ClientStateType,
+  SliceCaseReducers<ClientStateType>
+>({
   name: "addClient",
   initialState: addClientInitialState,
   reducers: {

@@ -80,7 +80,8 @@ export default function CompoAddClient({
     (state: RootState) => state.editClientState
   );
   const { data } = useSelector((state: RootState) => state.selectedClientState);
-
+  const [controlEditLoading, setControlEditLoading] = useState(false);
+  const [AddClientLoading, setAddClientLoading] = useState(false);
   const [clientData, setClientData] = useState<ClientType>({
     clientName: "",
     email: "",
@@ -99,28 +100,31 @@ export default function CompoAddClient({
   });
 
   React.useEffect(() => {
-    if (editClientState.loading === "succeeded") {
-      console.log(editClientState.loading);
+    if (editClientState.loading === "succeeded" && controlEditLoading) {
+      setControlEditLoading(false);
       dispatch(makeStateLoadingNeutralInEditClient());
-      // if (adminId) dispatch(getAllClientsByAdminIdAction(adminId));
-      // if (clientToEdit && clientToEdit._id === data._id) {
-      //   dispatch(getClientByIdAction(clientToEdit?._id!));
-      // }
+      if (adminId) {
+        dispatch(getAllClientsByAdminIdAction(adminId));
+      }
+      if (clientToEdit && clientToEdit._id === data._id) {
+        dispatch(getClientByIdAction(clientToEdit?._id!));
+      }
       enqueueSnackbar({
         message: "Edit client successfull",
         variant: "success",
       });
       setFormError("");
       handleClose();
-    } else if (editClientState.loading === "failed") {
+    } else if (editClientState.loading === "failed" && controlEditLoading) {
+      setControlEditLoading(false);
       setFormError(`${editClientState.error}`);
       enqueueSnackbar({
         message: "Edit client failed",
         variant: "error",
       });
+      dispatch(makeStateLoadingNeutralInEditClient());
     }
-    // dispatch(makeStateLoadingNeutralInEditClient());
-  }, [editClientState]);
+  }, [editClientState.loading, editClientState]);
 
   React.useEffect(() => {
     if (clientToEdit) {
@@ -137,22 +141,25 @@ export default function CompoAddClient({
   }, [adminId]);
 
   React.useEffect(() => {
-    if (addClientLoading === "succeeded") {
+    console.log("Inside add client loding", addClientLoading, AddClientLoading);
+    if (addClientLoading === "succeeded" && AddClientLoading) {
+      setAddClientLoading(false);
       enqueueSnackbar({
         message: "Client added successfully",
         variant: "success",
       });
       setFormError("");
       handleClose();
-    } else if (addClientLoading === "failed") {
+    } else if (addClientLoading === "failed" && AddClientLoading) {
+      setAddClientLoading(false);
       setFormError(`${addClientError}`);
       enqueueSnackbar({
         message: "Error in adding client.Try again!",
         variant: "error",
       });
     }
-    dispatch(makeStateLoadingNeutralInAddClient());
-  }, [addClientError, addClientLoading, addedClient]);
+    // dispatch(makeStateLoadingNeutralInAddClient());
+  }, [addClientLoading, addedClient]);
 
   React.useEffect(() => {
     setClientData({
@@ -180,6 +187,9 @@ export default function CompoAddClient({
         ...clientData,
         [name]: value.toLocaleUpperCase(),
       });
+    } else if (name === "email") {
+      let sanitisedEmail = value.trim();
+      setClientData({ ...clientData, email: sanitisedEmail });
     } else {
       setClientData({
         ...clientData,
@@ -206,11 +216,17 @@ export default function CompoAddClient({
   }
 
   function areEntriesValid(obj: any) {
-    if (obj.contactNo.length !== 10) {
+    let clientNameTemp = obj.clientName.trim();
+    if (clientNameTemp.length < 2) {
+      setFormError("Client name minimum length is 2");
+      return false;
+    } else if (obj.contactNo.length !== 10) {
       setFormError("Contactno. must be of 10 digit only.");
       return false;
-    } else if (obj.clientName.length > 50) {
-      setFormError("Client name must not exceed 50 characters.");
+    } else if (obj.clientName.length > 50 || obj.clientName.length < 2) {
+      setFormError(
+        "Client name must not exceed 50 characters and not below 2 characters."
+      );
       return false;
     } else if (obj.gistin.length !== 15) {
       setFormError("Gstin must be of 15 digit only.");
@@ -241,7 +257,9 @@ export default function CompoAddClient({
   }
 
   const handleSubmit = () => {
+    setClientData({ ...clientData, clientName: clientData.clientName.trim() });
     if (areAllFieldsFilled(clientData) && areEntriesValid(clientData)) {
+      setAddClientLoading(true);
       dispatch(addNewClientAction(clientData));
     } else {
       setIncompleteError("Incomplete fields");
@@ -256,6 +274,7 @@ export default function CompoAddClient({
       const clientId = clientToEdit._id!;
       const prop = { clientId, clientData };
       dispatch(editClientAction(prop));
+      setControlEditLoading(true);
     } else {
       setIncompleteError("Incomplete fields");
     }
@@ -393,7 +412,13 @@ export default function CompoAddClient({
             }}
             required
           />
-          <Typography className="text-xs opacity-70">Select Region</Typography>
+          <Typography
+            className="text-xs opacity-70 mt-4"
+            sx={{ marginTop: "10px" }}
+          >
+            {" "}
+            Select Region
+          </Typography>
           {forEditClient ? (
             <label className="text-xs my-8">
               <span>

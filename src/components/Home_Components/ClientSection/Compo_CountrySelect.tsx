@@ -57,7 +57,7 @@ export default function SelectCountryStateCity({
   }));
 
   return (
-    <div className="App">
+    <div className="my-2 flex flex-col gap-3">
       <Select
         options={countriesArr}
         getOptionLabel={(options) => {
