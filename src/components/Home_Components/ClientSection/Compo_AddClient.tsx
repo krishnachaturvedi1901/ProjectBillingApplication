@@ -76,11 +76,9 @@ export default function CompoAddClient({
     data: addedClient,
     error: addClientError,
   } = useSelector((state: RootState) => state.addClientState);
-  const {
-    loading: editClientLoading,
-    data: editedClientStatus,
-    error: editClientError,
-  } = useSelector((state: RootState) => state.editClientState);
+  const editClientState = useSelector(
+    (state: RootState) => state.editClientState
+  );
   const { data } = useSelector((state: RootState) => state.selectedClientState);
 
   const [clientData, setClientData] = useState<ClientType>({
@@ -101,31 +99,28 @@ export default function CompoAddClient({
   });
 
   React.useEffect(() => {
-    if (editClientLoading === "succeeded") {
-      console.log(
-        "Inside editClientSuccess}}}}}}}}}}}}}}}}}}}}}}+++>",
-        editClientLoading
-      );
+    if (editClientState.loading === "succeeded") {
+      console.log(editClientState.loading);
       dispatch(makeStateLoadingNeutralInEditClient());
-      if (adminId) dispatch(getAllClientsByAdminIdAction(adminId));
-      if (clientToEdit && clientToEdit._id === data._id) {
-        dispatch(getClientByIdAction(clientToEdit?._id!));
-      }
+      // if (adminId) dispatch(getAllClientsByAdminIdAction(adminId));
+      // if (clientToEdit && clientToEdit._id === data._id) {
+      //   dispatch(getClientByIdAction(clientToEdit?._id!));
+      // }
       enqueueSnackbar({
         message: "Edit client successfull",
         variant: "success",
       });
       setFormError("");
       handleClose();
-    } else if (editClientLoading === "failed") {
-      setFormError(`${editClientError}`);
+    } else if (editClientState.loading === "failed") {
+      setFormError(`${editClientState.error}`);
       enqueueSnackbar({
         message: "Edit client failed",
         variant: "error",
       });
     }
     // dispatch(makeStateLoadingNeutralInEditClient());
-  }, [editClientLoading, editClientError]);
+  }, [editClientState]);
 
   React.useEffect(() => {
     if (clientToEdit) {
@@ -299,7 +294,8 @@ export default function CompoAddClient({
         ) : incompleteError.length > 0 ? (
           <Alert severity="error"> {incompleteError}</Alert>
         ) : null}
-        {addClientLoading === "pending" || editClientLoading === "pending" ? (
+        {addClientLoading === "pending" ||
+        editClientState.loading === "pending" ? (
           <LinearProgress />
         ) : null}
         <DialogContent>
