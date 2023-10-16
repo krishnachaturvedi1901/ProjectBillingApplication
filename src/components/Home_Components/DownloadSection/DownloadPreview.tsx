@@ -29,7 +29,6 @@ const DownloadPreview = () => {
     invoiceObject.amountAfterTax - invoiceObject.amountWithoutTax
   ).toFixed(2);
 
-  console.log("download executed");
   if (data.companyLogo === "https://gammaedge.io/images/logo1.png") {
   }
   return (

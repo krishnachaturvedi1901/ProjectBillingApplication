@@ -34,7 +34,11 @@ const initialState: EditClientStateType = {
 const editClientSlice = createSlice({
   name: "editClient",
   initialState,
-  reducers: {},
+  reducers: {
+    makeStateLoadingNeutralInEditClient: (state) => {
+      return { ...state, loading: "idle" };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(editClientAction.pending, (state, action) => {
@@ -52,4 +56,5 @@ const editClientSlice = createSlice({
   },
 });
 
+export const { makeStateLoadingNeutralInEditClient } = editClientSlice.actions;
 export default editClientSlice.reducer;

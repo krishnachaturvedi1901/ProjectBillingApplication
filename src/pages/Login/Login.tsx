@@ -8,13 +8,14 @@ import { AiOutlineEye } from "react-icons/ai";
 import { useLoginMutation } from "../../states/query/Login_queries/loginQueries";
 import { AuthContext } from "../../states/context/AuthContext/AuthContext";
 import { validateToken } from "../../states/context/AuthContext/validateToken";
-import { LinearProgress } from "@mui/material";
+import { Alert, LinearProgress } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import {
   useVerifyEmailToGenerateOtp,
   useVerifyOtp,
 } from "../../states/query/ChangePassword_queries/changePasswordQueries";
 import { enqueueSnackbar } from "notistack";
+import ChangePassword from "../../components/Login_Components/ChangePassword";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,17 +27,11 @@ const Login = () => {
   const [requestLiteral, setRequestLiteral] = useState("Send Otp");
   const [startTimer, setStartTimer] = useState(false);
   const [invalidError, setInvalidError] = useState("");
-  const [timer, setTimer] = useState(120);
+  const [timer, setTimer] = useState(180);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
-  const {
-    isAuth,
-    setIsAuth,
-    adminId,
-    setAdminId,
-    setAdminData,
-    logoutAdmin,
-  } = useContext(AuthContext);
+  const { isAuth, setIsAuth, adminId, setAdminId, setAdminData, logoutAdmin } =
+    useContext(AuthContext);
   const [authData, setAuthData] = useState({ email: "", password: "" });
 
   useEffect(() => {
@@ -81,6 +76,8 @@ const Login = () => {
   }, [timer]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("changeing authData-login", authData);
+    setInvalidError("");
     const { name, value } = e.target;
     setAuthData({ ...authData, [name]: value });
   };
@@ -124,6 +121,7 @@ const Login = () => {
     setOtpData({ ...otpData, email: "", otp: "" });
     setAuthData({ ...authData, email: "", password: "" });
     setOtp("");
+    setRequestLiteral("Send Otp");
     setStartChangePassword(!startChangePassword);
   };
 
@@ -148,9 +146,10 @@ const Login = () => {
       GenerateOtpMutationHandler.mutate(otpData.email, {
         onSuccess: () => {
           enqueueSnackbar({
-            message: "Otp send successfully check email",
+            message: "Otp sent successfully check email",
             variant: "success",
           });
+          setTimer(180);
           setStartTimer(true);
         },
         onError: () => {
@@ -201,6 +200,16 @@ const Login = () => {
     }
   };
 
+  const handleSetOtpVerified = (value: boolean) => {
+    setOtpVerified(value);
+    // setOtpData({ ...otpData, email: "", otp: "" });
+    // setAuthData({ ...authData, email: "", password: "" });
+    // setOtp("");
+    // setRequestLiteral("Send Otp");
+    // setStartChangePassword(false);
+    window.location.reload();
+  };
+
   if (isAuth) {
     return <Navigate to={"/"} />;
   }
@@ -240,14 +249,14 @@ const Login = () => {
                 }}
               >
                 {invalidError.length > 0 ? (
-                  <p id={styles.errorWarningPTag}>{invalidError}</p>
+                  <Alert severity="error">{invalidError}</Alert>
                 ) : null}
                 {otpLoading ? <LinearProgress /> : null}
-                {isError ? (
-                  <p id={styles.errorWarningPTag}>
+                {isError && !startChangePassword ? (
+                  <Alert severity="error">
                     User with give email or password not found! Try using right
                     email and password.
-                  </p>
+                  </Alert>
                 ) : null}
                 {isLoading ? <LinearProgress /> : null}
                 <label htmlFor="email">Email:</label>
@@ -273,15 +282,17 @@ const Login = () => {
                       value={otpData.email}
                       onChange={(e) => handleOtpDataChange(e)}
                     />
-                    {!startTimer ? (
+                    {!startTimer && !otpLoading ? (
                       <div
                         onClick={handleSentOtpCommand}
-                        className="text-sm cursor-pointer "
+                        className="text-sm cursor-pointer text-indigo-700 mb-4 "
                       >
                         {requestLiteral}
                       </div>
                     ) : (
-                      <div className="text-sm">{timer}</div>
+                      <div className="text-sm text-red-600 mb-4">
+                        {timer} sec.
+                      </div>
                     )}
                   </>
                 )}
@@ -358,7 +369,10 @@ const Login = () => {
             </div>
           </div>
         ) : (
-          <div>Recreate password</div>
+          <ChangePassword
+            email={otpData.email}
+            handleSetOtpVerified={handleSetOtpVerified}
+          />
         )}
       </div>
       <div className=" bg-[#989fce] text-colorDarkFont dark:text-colorLightFont dark:bg-slate-800 md:w-2/3 sm:h-40 md:h-auto p-4 md:p-24 text-3xl md:text-6xl flex justify-start items-center md:flex-col m-0  ">

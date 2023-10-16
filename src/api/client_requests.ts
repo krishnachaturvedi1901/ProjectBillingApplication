@@ -15,8 +15,8 @@ export async function getAllClientsByAdminId(adminId: string) {
       },
     });
     return response.data;
-  } catch (error) {
-    throw new Error(`Error in getting allclients ${error}`);
+  } catch (error: any) {
+    throw new Error(`${error.response.data.message}`);
   }
 }
 export async function getClientByClientId(clientId: string) {
@@ -31,8 +31,8 @@ export async function getClientByClientId(clientId: string) {
       },
     });
     return response.data;
-  } catch (error) {
-    throw new Error(`Network error during fetch client by id ${error}`);
+  } catch (error: any) {
+    throw new Error(`${error.response.data.message}`);
   }
 }
 export async function addClient(clientData: ClientType) {
@@ -48,8 +48,8 @@ export async function addClient(clientData: ClientType) {
       },
     });
     return response.data;
-  } catch (error) {
-    throw new Error(`Error in adding client ${error}`);
+  } catch (error: any) {
+    throw new Error(`${error.response.data.message}`);
   }
 }
 export async function editClient(clientId: string, clientData: ClientType) {
@@ -69,8 +69,8 @@ export async function editClient(clientId: string, clientData: ClientType) {
       }
     );
     return response.data;
-  } catch (error) {
-    throw new Error(`Error in editing client ${error}`);
+  } catch (error: any) {
+    throw new Error(`${error.response.data.message}`);
   }
 }
 export async function deleteClientByClientId(clientId: string) {
@@ -85,7 +85,7 @@ export async function deleteClientByClientId(clientId: string) {
       },
     });
     return response.data;
-  } catch (error) {
-    throw new Error(`Error in deleting client by id ${error}`);
+  } catch (error: any) {
+    throw new Error(`${error.response.data.message}`);
   }
 }

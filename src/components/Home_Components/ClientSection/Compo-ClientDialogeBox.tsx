@@ -14,16 +14,25 @@ import Radio from "@mui/material/Radio";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { ClientType } from "../../../types/types";
 import { useDispatch, useSelector } from "react-redux";
-import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
+import {
+  getClientByIdAction,
+  makeStateNeutralOfSelectedClient,
+} from "../../../states/redux/ClientStates/selectedClientSlice";
 import { AppDispatch, RootState } from "../../../states/redux/store";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import { removeAllProjectsFromInvoiceAction } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
 import { CircularProgress, useTheme } from "@mui/material";
-import { deleteClientAction } from "../../../states/redux/ClientStates/deleteClientSlice";
+import {
+  addDetelingClientIdInState,
+  deleteClientAction,
+  makeStateLoadingNeutralInDeleteClient,
+} from "../../../states/redux/ClientStates/deleteClientSlice";
 import { MdOutlineDeleteSweep } from "react-icons/md";
 import { enqueueSnackbar } from "notistack";
 import CompoLoading from "./Compo-Loding";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
+import { CiEdit } from "react-icons/ci";
+import CompoAddClient from "./Compo_AddClient";
 
 function ConfirmationDialogRaw(props: {
   onClose: (newValue: string) => void;
@@ -45,11 +54,8 @@ function ConfirmationDialogRaw(props: {
     data: clients,
     error: clientsError,
   } = useSelector((state: RootState) => state.allClientsState);
-
-  console.log(
-    "====================================================================>",
-    clients
-  );
+  const [deletingClientIdString, setDeletingClientIdString] =
+    React.useState("");
 
   React.useEffect(() => {
     if (!open) {
@@ -67,12 +73,15 @@ function ConfirmationDialogRaw(props: {
         message: "Client deleted successfully",
         variant: "success",
       });
+      dispatch(makeStateLoadingNeutralInDeleteClient());
+      dispatch(makeStateNeutralOfSelectedClient());
     } else if (deleteLoading === "failed") {
       enqueueSnackbar({
         message: "Error in deleting client",
         variant: "error",
       });
     }
+    dispatch(makeStateLoadingNeutralInDeleteClient());
   }, [deleteLoading, deleteError]);
 
   const handleEntering = () => {
@@ -92,13 +101,13 @@ function ConfirmationDialogRaw(props: {
     setValue(event.target.value);
   };
 
-  const handleEditClient = (client: ClientType) => {};
-
   const handleDeleteClient = (clientId: string | undefined) => {
     if (clientId) {
+      setDeletingClientIdString(clientId);
       dispatch(deleteClientAction(clientId));
     }
   };
+
   return (
     <Dialog
       sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 435 } }}
@@ -129,13 +138,15 @@ function ConfirmationDialogRaw(props: {
                     width: "50%",
                   }}
                 />
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleEditClient(client)}
-                >
-                  Edit
+                <div>
+                  <CompoAddClient
+                    forEditClient={true}
+                    clientToEdit={client}
+                    handleSelectClientClose={handleCancel}
+                  />
                 </div>
-                {deleteLoading === "pending" ? (
+                {deleteLoading === "pending" &&
+                deletingClientIdString === client._id ? (
                   <CircularProgress size={25} />
                 ) : (
                   <div

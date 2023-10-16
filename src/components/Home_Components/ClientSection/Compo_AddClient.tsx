@@ -8,7 +8,10 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux"; // Assuming you're using Redux
-import { addNewClientAction } from "../../../states/redux/ClientStates/addClientSlice";
+import {
+  addNewClientAction,
+  makeStateLoadingNeutralInAddClient,
+} from "../../../states/redux/ClientStates/addClientSlice";
 import { AppDispatch, RootState } from "../../../states/redux/store";
 import {
   CityInfoType,
@@ -20,13 +23,31 @@ import SelectCountryStateCity from "./Compo_CountrySelect";
 import { Alert, LinearProgress, Typography, useTheme } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
+import { CiEdit } from "react-icons/ci";
+import {
+  editClientAction,
+  makeStateLoadingNeutralInEditClient,
+} from "../../../states/redux/ClientStates/editClientSlice";
+import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
+import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
 
-export default function CompoAddClient() {
+export default function CompoAddClient({
+  forEditClient,
+  clientToEdit,
+  handleSelectClientClose,
+}: {
+  forEditClient: boolean;
+  clientToEdit: ClientType | null;
+  handleSelectClientClose?: () => void | undefined;
+}) {
   const { adminId } = React.useContext(AuthContext);
   //--------------------------------------------------------
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
+    if (handleSelectClientClose) {
+      handleSelectClientClose();
+    }
     setOpen(true);
   };
 
@@ -49,13 +70,18 @@ export default function CompoAddClient() {
   const [incompleteError, setIncompleteError] = useState("");
   const [formError, setFormError] = useState("");
 
-  console.log("country", selectedCountry.name);
   const dispatch = useDispatch<AppDispatch>();
   const {
     loading: addClientLoading,
     data: addedClient,
     error: addClientError,
   } = useSelector((state: RootState) => state.addClientState);
+  const {
+    loading: editClientLoading,
+    data: editedClientStatus,
+    error: editClientError,
+  } = useSelector((state: RootState) => state.editClientState);
+  const { data } = useSelector((state: RootState) => state.selectedClientState);
 
   const [clientData, setClientData] = useState<ClientType>({
     clientName: "",
@@ -73,7 +99,41 @@ export default function CompoAddClient() {
     },
     user: "",
   });
-  console.log("ClientData", clientData);
+
+  React.useEffect(() => {
+    if (editClientLoading === "succeeded") {
+      console.log(
+        "Inside editClientSuccess}}}}}}}}}}}}}}}}}}}}}}+++>",
+        editClientLoading
+      );
+      dispatch(makeStateLoadingNeutralInEditClient());
+      if (adminId) dispatch(getAllClientsByAdminIdAction(adminId));
+      if (clientToEdit && clientToEdit._id === data._id) {
+        dispatch(getClientByIdAction(clientToEdit?._id!));
+      }
+      enqueueSnackbar({
+        message: "Edit client successfull",
+        variant: "success",
+      });
+      setFormError("");
+      handleClose();
+    } else if (editClientLoading === "failed") {
+      setFormError(`${editClientError}`);
+      enqueueSnackbar({
+        message: "Edit client failed",
+        variant: "error",
+      });
+    }
+    // dispatch(makeStateLoadingNeutralInEditClient());
+  }, [editClientLoading, editClientError]);
+
+  React.useEffect(() => {
+    if (clientToEdit) {
+      setClientData({ ...clientToEdit });
+    } else {
+      setClientData({ ...clientData });
+    }
+  }, [clientToEdit, open]);
 
   React.useEffect(() => {
     if (adminId) {
@@ -82,25 +142,21 @@ export default function CompoAddClient() {
   }, [adminId]);
 
   React.useEffect(() => {
-    console.log(
-      "Added client state======>",
-      addClientLoading,
-      addedClient,
-      addClientError
-    );
-    if (addClientLoading === "succeeded" && addedClient._id) {
+    if (addClientLoading === "succeeded") {
       enqueueSnackbar({
-        message: "Client add successfully",
+        message: "Client added successfully",
         variant: "success",
       });
+      setFormError("");
       handleClose();
     } else if (addClientLoading === "failed") {
-      setFormError("Network error try again!");
+      setFormError(`${addClientError}`);
       enqueueSnackbar({
         message: "Error in adding client.Try again!",
         variant: "error",
       });
     }
+    dispatch(makeStateLoadingNeutralInAddClient());
   }, [addClientError, addClientLoading, addedClient]);
 
   React.useEffect(() => {
@@ -125,7 +181,6 @@ export default function CompoAddClient() {
   ) => {
     const { name, value } = e.target;
     if (name === "gistin" || name === "pancardNo") {
-      console.log("Inside handle change", name, value);
       setClientData({
         ...clientData,
         [name]: value.toLocaleUpperCase(),
@@ -159,6 +214,9 @@ export default function CompoAddClient() {
     if (obj.contactNo.length !== 10) {
       setFormError("Contactno. must be of 10 digit only.");
       return false;
+    } else if (obj.clientName.length > 50) {
+      setFormError("Client name must not exceed 50 characters.");
+      return false;
     } else if (obj.gistin.length !== 15) {
       setFormError("Gstin must be of 15 digit only.");
       return false;
@@ -167,10 +225,21 @@ export default function CompoAddClient() {
       return false;
     } else if (obj.email) {
       const pattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      !pattern.test(obj.email)
-        ? setFormError("Invalid email address*")
-        : setFormError("");
+      if (!pattern.test(obj.email)) {
+        setFormError("Invalid email address*");
+        return false;
+      } else if (/\s/.test(obj.email)) {
+        setFormError("Invalid email address,spaces not allowed*");
+        return false;
+      } else if (obj.email.length > 50) {
+        setFormError("Email must be less then 51 characters");
+        return false;
+      }
+      setFormError("");
       return pattern.test(obj.email);
+    } else if (obj.address.street.length > 50) {
+      setFormError("Street name must not exceed 50 characters");
+      return false;
     }
     setFormError("");
     return true;
@@ -183,29 +252,56 @@ export default function CompoAddClient() {
       setIncompleteError("Incomplete fields");
     }
   };
+  const handleEditClientSubmit = () => {
+    if (
+      areAllFieldsFilled(clientData) &&
+      areEntriesValid(clientData) &&
+      clientToEdit
+    ) {
+      const clientId = clientToEdit._id!;
+      const prop = { clientId, clientData };
+      dispatch(editClientAction(prop));
+    } else {
+      setIncompleteError("Incomplete fields");
+    }
+  };
 
   return (
     <div>
-      <Button
-        variant="contained"
-        sx={{
-          backgroundColor: materialTheme.palette.primary.main,
-          ":hover": {
-            backgroundColor: materialTheme.palette.secondary.main,
-          },
-        }}
-        onClick={handleClickOpen}
-      >
-        Add Client
-      </Button>
+      {!forEditClient ? (
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: materialTheme.palette.primary.main,
+            ":hover": {
+              backgroundColor: materialTheme.palette.secondary.main,
+            },
+          }}
+          onClick={handleClickOpen}
+        >
+          Add Client
+        </Button>
+      ) : (
+        <Button onClick={handleClickOpen}>
+          <CiEdit
+            size={20}
+            className="text-thirdColor hover:text-violet-900  "
+          />
+        </Button>
+      )}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Client</DialogTitle>;
+        <DialogTitle>
+          {forEditClient ? "Edit Client" : "Add Client"}
+        </DialogTitle>
+        ;
         {formError.length > 0 ? (
           <Alert severity="error"> {formError}</Alert>
         ) : incompleteError.length > 0 ? (
           <Alert severity="error"> {incompleteError}</Alert>
         ) : null}
-        {addClientLoading === "pending" ? <LinearProgress /> : null}
+        {addClientLoading === "pending" || editClientLoading === "pending" ? (
+          <LinearProgress />
+        ) : null}
         <DialogContent>
           <TextField
             autoFocus
@@ -302,6 +398,19 @@ export default function CompoAddClient() {
             required
           />
           <Typography className="text-xs opacity-70">Select Region</Typography>
+          {forEditClient ? (
+            <label className="text-xs my-8">
+              <span>
+                Country:<b>{clientData.address.country}</b> |{" "}
+              </span>
+              <span>
+                State:<b>{clientData.address.state}</b> |
+              </span>{" "}
+              <span>
+                City:<b>{clientData.address.city}</b>
+              </span>
+            </label>
+          ) : null}
           <SelectCountryStateCity
             selectedCountry={selectedCountry}
             selectedState={selectedState}
@@ -330,7 +439,11 @@ export default function CompoAddClient() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>Add Client</Button>
+          {!forEditClient ? (
+            <Button onClick={handleSubmit}>Add Client</Button>
+          ) : (
+            <Button onClick={handleEditClientSubmit}>Edit Client</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

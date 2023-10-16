@@ -17,7 +17,7 @@
   display: block;
   padding: 8px;
   margin-top: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   width: 70%;
   border: 1px solid #cecece;
 }
@@ -94,6 +94,15 @@
   .loginDiv > form > input {
     width: 100%;
   }
+  .loginPasswordDiv > input {
+    width: 100%;
+  }
+  .showPassEyeDiv {
+    position: absolute;
+    left: 92%;
+    top: 55%;
+  }
+
   .signupDiv {
     padding-top: 60px;
     text-align: start;

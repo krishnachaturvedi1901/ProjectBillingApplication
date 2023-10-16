@@ -25,7 +25,6 @@ const SelectClient = () => {
   const addedNewClientState = useSelector(
     (state: RootState) => state.addClientState
   );
-  console.log("selectedClient-", selectedClient);
   // -------------------------------------------------------
   // "https://gammaedge.io/images/logo1.png";
   // "https://www.cubexo.io/images/Logo.webp";
@@ -109,7 +108,7 @@ const SelectClient = () => {
           <ConfirmationDialog />
         </div>
         <div>
-          <CompoAddClient />
+          <CompoAddClient forEditClient={false} clientToEdit={null} />
         </div>
       </div>
       <div className="flex flex-row text-xs sm:text-sm  sm:flex-row  w-auto    m-2 rounded-lg sm:mx-8 bg-white dark:bg-slate-800 bg-opacity-50 shadow-lg dark:shadow-slate-950 sm:p-2 ">
@@ -147,6 +146,10 @@ const SelectClient = () => {
                     <b>Contact: </b>
                     {data.contactNo}
                   </b>
+                  <p>
+                    <b>Email: </b>
+                    {data.email}
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  SliceCaseReducers,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { getAdminByAdminId } from "../../../api/admin_requests";
 import { AdminType } from "../../../types/types";
 
@@ -26,7 +30,10 @@ const adminInitialState: AdminInitialStateType = {
   error: null,
 };
 
-const createAdminSlice = createSlice({
+const createAdminSlice = createSlice<
+  AdminInitialStateType,
+  SliceCaseReducers<AdminInitialStateType>
+>({
   name: "admin",
   initialState: adminInitialState,
   reducers: {},

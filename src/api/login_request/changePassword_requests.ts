@@ -4,10 +4,10 @@ import { LoginDataType } from "../../types/types";
 
 export async function generateOtp(emailData: string) {
   try {
-    const response = await axios.post(
-      `${config.apiUrlAuth}/generate`,
-      emailData
-    );
+    const response = await axios.post(`${config.apiUrlAuth}/generate`, {
+      email: emailData,
+    });
+    console.log("response after generate otp", response);
     return response.data;
   } catch (error) {
     throw new Error(`Error in admin generate otp ${error}`);

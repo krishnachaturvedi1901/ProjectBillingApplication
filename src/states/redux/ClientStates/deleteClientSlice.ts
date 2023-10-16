@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ClientType } from "../../../types/types";
 import { deleteClientByClientId } from "../../../api/client_requests";
 
@@ -29,7 +29,14 @@ const initialState: deleteClientStateType = {
 const deleteClientSlice = createSlice({
   name: "deleteClient",
   initialState,
-  reducers: {},
+  reducers: {
+    makeStateLoadingNeutralInDeleteClient: (state) => {
+      return { ...state, deleteLoading: "idle" };
+    },
+    addDetelingClientIdInState: (state, action: PayloadAction<string>) => {
+      return { ...state, deletingClientId: action.payload };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(deleteClientAction.pending, (state, action) => {
@@ -46,5 +53,8 @@ const deleteClientSlice = createSlice({
       });
   },
 });
-
+export const {
+  makeStateLoadingNeutralInDeleteClient,
+  addDetelingClientIdInState,
+} = deleteClientSlice.actions;
 export default deleteClientSlice.reducer;

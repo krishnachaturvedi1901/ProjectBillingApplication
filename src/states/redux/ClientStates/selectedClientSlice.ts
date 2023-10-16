@@ -31,7 +31,11 @@ const clientInitialState: ClientStateType = {
 const selectedClientSlice = createSlice({
   name: "singleClient",
   initialState: clientInitialState,
-  reducers: {},
+  reducers: {
+    makeStateNeutralOfSelectedClient: (state) => {
+      return { ...state, loading: "idle", data: {} as ClientType, error: null };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getClientByIdAction.pending, (state, action) => {
@@ -47,5 +51,5 @@ const selectedClientSlice = createSlice({
       });
   },
 });
-
+export const { makeStateNeutralOfSelectedClient } = selectedClientSlice.actions;
 export default selectedClientSlice.reducer;
