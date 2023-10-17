@@ -20,6 +20,7 @@ import {
   removeProjectFromInvoiceAction,
 } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
 import ActionConfirmer from "../../Navbar/ActionConfirmer";
+import BillAmount from "../InvoiceSection/BillAmount";
 
 const ProjectTable = () => {
   const dispatch = useDispatch();
@@ -264,6 +265,7 @@ const ProjectTable = () => {
           </tbody>
         </table>
       </div>
+      <BillAmount />
     </section>
   );
 };

@@ -26,41 +26,12 @@ import DownloadPreview from "../DownloadSection/DownloadPreview";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { ThemeContext } from "../../../states/context/ThemeContext/ThemeContext";
+import { AppBar, Dialog, IconButton, Toolbar } from "@mui/material";
+import Slide from "@mui/material/Slide";
+import { TransitionProps } from "@mui/material/transitions";
+// import CloseIcon from "@mui/icons-material/Close";
 const drawerBleeding = 56;
 let windowWidth: number | undefined = window.innerWidth;
-
-interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window?: () => Window;
-}
-
-const Root = styled("div")(({ theme }) => {
-  const materialTheme = useTheme();
-  return {
-    height: "100%",
-    backgroundColor: deepPurple[300],
-  };
-});
-
-const StyledBox = styled(Box)(({ theme }) => {
-  const materialTheme = useTheme();
-  return {
-    // backgroundColor: "whitesmoke",
-  };
-});
-
-const Puller = styled(Box)(({ theme }) => ({
-  width: 30,
-  height: 6,
-  backgroundColor: theme.palette.mode === "light" ? grey[100] : grey[900],
-  borderRadius: 3,
-  position: "absolute",
-  top: 8,
-  left: "calc(50% - 15px)",
-}));
 
 export default function InvoiceDrawer() {
   const materialTheme = useTheme();
@@ -81,10 +52,12 @@ export default function InvoiceDrawer() {
   const [open, setOpen] = React.useState(false);
   const [tempImgData, setTempImgData] = React.useState("");
   const [allowDownload, setAllowDownload] = React.useState(true);
-  const [bgColorHeadStyledBox, setBgColorHeadStyledBox] =
-    React.useState("#151e2d");
-  const [bgColorBodyStyledBox, setBgColorBodyStyledBox] =
-    React.useState("#334155");
+  const [bgColorHeadStyledBox, setBgColorHeadStyledBox] = React.useState(
+    "#151e2d"
+  );
+  const [bgColorBodyStyledBox, setBgColorBodyStyledBox] = React.useState(
+    "#334155"
+  );
   const [textColor, setTextColor] = React.useState("whitesmoke");
 
   const { enqueueSnackbar } = useSnackbar();
@@ -221,18 +194,19 @@ export default function InvoiceDrawer() {
   const handleDueDateChange = (newDate: dayjs.Dayjs | null) => {
     if (!newDate) {
       dispatch(updateInvoiceObjectStateAction({ dueDate: "" }));
-
+      setAllowDownload(false);
       return;
     }
     if (newDate.isBefore(invoiceDate)) {
       enqueueSnackbar("Due date cannot be before invoice date.", {
         variant: "error",
       });
+      setAllowDownload(false);
       dispatch(updateInvoiceObjectStateAction({ dueDate: "" }));
-
       return;
     } else {
       setDueDate(newDate);
+      setAllowDownload(true);
       const iso8601DueDate = newDate.toISOString();
       dispatch(updateInvoiceObjectStateAction({ dueDate: iso8601DueDate }));
     }
@@ -336,7 +310,7 @@ export default function InvoiceDrawer() {
   };
 
   return (
-    <Root>
+    <Box>
       <CssBaseline />
       <Global
         styles={{
@@ -346,7 +320,6 @@ export default function InvoiceDrawer() {
           },
         }}
       />
-      {/* <PdfGenerator ref={targetRef} /> */}
       <Box
         sx={{
           position: "fixed",
@@ -362,6 +335,7 @@ export default function InvoiceDrawer() {
           Invoice
         </Button>
       </Box>
+
       <SwipeableDrawer
         anchor="bottom"
         open={open}
@@ -372,8 +346,13 @@ export default function InvoiceDrawer() {
         ModalProps={{
           keepMounted: true,
         }}
+        sx={{
+          width: "100%",
+          height: "40%",
+        }}
       >
-        <StyledBox
+        {/*Drawer header*/}
+        <Box
           sx={{
             position: "absolute",
             top: -drawerBleeding,
@@ -385,7 +364,17 @@ export default function InvoiceDrawer() {
             bgcolor: bgColorHeadStyledBox,
           }}
         >
-          <Puller />
+          <Box
+            sx={{
+              width: 30,
+              height: 6,
+              backgroundColor: grey[100],
+              borderRadius: 3,
+              position: "absolute",
+              top: 8,
+              left: "calc(50% - 15px)",
+            }}
+          ></Box>
           <Box
             sx={{
               p: 2,
@@ -401,16 +390,9 @@ export default function InvoiceDrawer() {
             Fill invoice required details.
             <span className="mr-8 text-sm">Invoice no.{invoiceNo}</span>
           </Box>
-          {/* <Box
-            sx={{
-              width: "98%",
-              borderBottom: "1px solid",
-              borderColor: deepPurple[900],
-              m: "auto",
-            }}
-          ></Box> */}
-        </StyledBox>
-        <StyledBox
+        </Box>
+        {/*Drawer body*/}
+        <Box
           sx={{
             px: 2,
             pb: 2,
@@ -419,6 +401,7 @@ export default function InvoiceDrawer() {
             bgcolor: bgColorBodyStyledBox,
           }}
         >
+          {/*Date and Bill*/}
           <Box
             sx={{
               display: { xs: "block", sm: "flex", md: "flex" },
@@ -427,6 +410,7 @@ export default function InvoiceDrawer() {
               justifyContent: "space-between",
             }}
           >
+            {/*Date picker*/}
             <Box
               sx={{
                 width: "270px",
@@ -480,6 +464,7 @@ export default function InvoiceDrawer() {
                 </>
               )}
             </Box>
+            {/*Bill section*/}
             <Box
               sx={{
                 minWidth: { xs: "100px", sm: "250px", md: "300px" },
@@ -517,6 +502,7 @@ export default function InvoiceDrawer() {
               </div>
             </Box>
           </Box>
+          {/*Download and Preview buttons*/}
           <Box
             sx={{
               display: "flex",
@@ -568,18 +554,18 @@ export default function InvoiceDrawer() {
               Preview
             </Button>
           </Box>
-        </StyledBox>
+        </Box>
       </SwipeableDrawer>
+
       {showPreview ? (
-        <div className="w-screen h-[1200px] absolute top-[0px] right-[0] z-[100] bg-[#989fce] bg-opacity-80 ">
+        <div className="w-screen h-[900px] sm:h-[1200px] absolute top-[0px] right-[0] z-[100] bg-[#989fce] bg-opacity-80 ">
           <div
             className="fixed top-[25px] right-[20px] flex  z-50 cursor-pointer hover:bg-inherit"
             onClick={() => previewExecution(false)}
           >
             <RxCross1 size={40} color="black" />
           </div>
-          <div className="m-auto w-full h-full flex justify-center items-start pt-0 ">
-            {/* <DownloadPreview /> */}
+          <div className="m-auto w-full h-full flex justify-center items-start pt-0 mt-[15%] sm:mt-[5%] ">
             {tempImgData.length > 0 ? (
               <img src={tempImgData} alt="invoice" />
             ) : (
@@ -588,6 +574,6 @@ export default function InvoiceDrawer() {
           </div>
         </div>
       ) : null}
-    </Root>
+    </Box>
   );
 }

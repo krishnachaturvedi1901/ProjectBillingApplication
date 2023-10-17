@@ -103,7 +103,7 @@ const SelectClient = () => {
 
   return (
     <section>
-      <div className="flex justify-around sm:justify-end items-center pr-4 pt-6 sm:pr-8 sticky top-16 bg-slate-200 dark:bg-slate-700 z-10 ">
+      <div className="flex justify-around sm:justify-end items-center pr-4 pt-6 sm:pr-8 sticky top-2 bg-slate-200 dark:bg-slate-700 z-10 ">
         <div>
           <ConfirmationDialog />
         </div>
@@ -146,7 +146,7 @@ const SelectClient = () => {
                     <b>Contact: </b>
                     {data.contactNo}
                   </b>
-                  <p className=" overflow-scroll sm:overflow-hidden">
+                  <p className=" overflow-scroll overflow-x-hidden overflow-y-hidden sm:overflow-hidden">
                     <b>Email: </b>
                     {data.email}
                   </p>
@@ -161,7 +161,7 @@ const SelectClient = () => {
           {clientObj && selectedClient.loading !== "idle" ? (
             <div className="text-black ml-0.5 sm:ml-4 dark:text-colorLightFont p-2 sm:p-4 w-full ">
               <div className=" text-black dark:text-colorLightFont  overflow-hidden overflow-ellipsis">
-                <h2 className=" text-sm sm:text-lg my-2 font-semibold overflow-scroll sm:overflow-hidden ">
+                <h2 className=" text-sm sm:text-lg my-2 font-semibold overflow-scroll overflow-x-hidden overflow-y-hidden sm:overflow-hidden ">
                   {clientObj.clientName}
                 </h2>
                 <p className="mt-2">
@@ -191,7 +191,7 @@ const SelectClient = () => {
                     <b>Contact: </b>
                     {clientObj.contactNo}
                   </p>
-                  <p className=" overflow-scroll sm:overflow-hidden">
+                  <p className=" overflow-scroll overflow-x-hidden overflow-y-hidden sm:overflow-hidden">
                     <b>Email: </b>
                     {clientObj.email}
                   </p>

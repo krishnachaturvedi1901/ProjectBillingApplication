@@ -62,16 +62,28 @@ export default function ActionConfirmer({
       >
         <DialogTitle
           id="alert-dialog-title"
-          sx={{ width: "300px", color: materialTheme.palette.primary.main }}
+          sx={{
+            width: "100%",
+            color: "#cecece",
+          }}
+          className="bg-thirdColor"
         >
           {"Confirm " + actionTag}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description"></DialogContentText>
+        <DialogContent className="mt-4">
+          <DialogContentText id="alert-dialog-description">
+            Make sure before proceed for this action. Do you really want to{" "}
+            {actionTag}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={() => executeActionFunction()} autoFocus>
+          <Button
+            onClick={() => executeActionFunction()}
+            autoFocus
+            className="bg-purple-900"
+            variant="contained"
+          >
             {actionTag}
           </Button>
         </DialogActions>
