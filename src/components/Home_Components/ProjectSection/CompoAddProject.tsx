@@ -225,8 +225,9 @@ export default function CompoAddProject({
       });
     }
     if (toEdit && projectToEdit) {
-      delete projectToEdit.amount;
-      setProjectData(projectToEdit);
+      let newProjectToEdit = { ...projectToEdit };
+      delete newProjectToEdit.amount;
+      setProjectData(newProjectToEdit);
     }
   }, [toEdit, forAddProject, projectToEdit, clientId, adminId]);
 

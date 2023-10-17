@@ -41,6 +41,10 @@ export default function CompoAddClient({
   handleSelectClientClose?: () => void | undefined;
 }) {
   const { adminId } = React.useContext(AuthContext);
+  const [controlEditLoading, setControlEditLoading] = useState(false);
+  const [addClientLoadingController, setAddClientLoadingController] =
+    useState(false);
+  console.log(addClientLoadingController);
   //--------------------------------------------------------
   const [open, setOpen] = React.useState(false);
 
@@ -80,8 +84,6 @@ export default function CompoAddClient({
     (state: RootState) => state.editClientState
   );
   const { data } = useSelector((state: RootState) => state.selectedClientState);
-  const [controlEditLoading, setControlEditLoading] = useState(false);
-  const [AddClientLoading, setAddClientLoading] = useState(false);
   const [clientData, setClientData] = useState<ClientType>({
     clientName: "",
     email: "",
@@ -124,7 +126,7 @@ export default function CompoAddClient({
       });
       dispatch(makeStateLoadingNeutralInEditClient());
     }
-  }, [editClientState.loading, editClientState]);
+  }, [editClientState]);
 
   React.useEffect(() => {
     if (clientToEdit) {
@@ -141,17 +143,21 @@ export default function CompoAddClient({
   }, [adminId]);
 
   React.useEffect(() => {
-    console.log("Inside add client loding", addClientLoading, AddClientLoading);
-    if (addClientLoading === "succeeded" && AddClientLoading) {
-      setAddClientLoading(false);
+    console.log(
+      "Inside add client loding",
+      addClientLoading,
+      addClientLoadingController
+    );
+    if (addClientLoading === "succeeded" && addClientLoadingController) {
+      setAddClientLoadingController(false);
       enqueueSnackbar({
         message: "Client added successfully",
         variant: "success",
       });
       setFormError("");
       handleClose();
-    } else if (addClientLoading === "failed" && AddClientLoading) {
-      setAddClientLoading(false);
+    } else if (addClientLoading === "failed" && addClientLoadingController) {
+      setAddClientLoadingController(false);
       setFormError(`${addClientError}`);
       enqueueSnackbar({
         message: "Error in adding client.Try again!",
@@ -159,7 +165,7 @@ export default function CompoAddClient({
       });
     }
     // dispatch(makeStateLoadingNeutralInAddClient());
-  }, [addClientLoading, addedClient]);
+  }, [addClientLoading]);
 
   React.useEffect(() => {
     setClientData({
@@ -259,7 +265,7 @@ export default function CompoAddClient({
   const handleSubmit = () => {
     setClientData({ ...clientData, clientName: clientData.clientName.trim() });
     if (areAllFieldsFilled(clientData) && areEntriesValid(clientData)) {
-      setAddClientLoading(true);
+      setAddClientLoadingController(true);
       dispatch(addNewClientAction(clientData));
     } else {
       setIncompleteError("Incomplete fields");
