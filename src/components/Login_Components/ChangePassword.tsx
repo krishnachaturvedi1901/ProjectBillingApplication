@@ -66,7 +66,6 @@ function ChangePassword({
     }
     return { message: "", isValid: true };
   };
-  console.log("newAuthData", newAuthData);
 
   const ResetPasswordMutationHandler = useResetPassword();
   const handleNewPasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {

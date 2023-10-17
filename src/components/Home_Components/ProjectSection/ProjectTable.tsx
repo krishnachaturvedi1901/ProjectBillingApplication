@@ -19,6 +19,7 @@ import {
   removeAllProjectsFromInvoiceAction,
   removeProjectFromInvoiceAction,
 } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
+import ActionConfirmer from "../../Navbar/ActionConfirmer";
 
 const ProjectTable = () => {
   const dispatch = useDispatch();
@@ -56,17 +57,6 @@ const ProjectTable = () => {
       },
     });
   };
-
-  // console.log(
-  //   isLoading,
-  //   data,
-  //   isError,
-  //   "->",
-  //   "clientId",
-  //   selectedClientState.data._id,
-  //   "adminId->",
-  //   adminId
-  // );
 
   if (isError || isLoading || data === "" || data.length <= 0) {
     return (
@@ -259,12 +249,11 @@ const ProjectTable = () => {
                       <div
                         className=" cursor-pointer 
                       opacity-70 hover:opacity-100 "
-                        onClick={() => handleProjectDelete(project._id)}
                       >
-                        <RiDeleteBin7Line
-                          color={materialTheme.palette.primary.main}
-                          size={25}
-                          style={{ margin: "auto" }}
+                        <ActionConfirmer
+                          actionTag="Delete"
+                          actionFunction={handleProjectDelete}
+                          parameter={project._id}
                         />
                       </div>
                     </div>

@@ -4,11 +4,12 @@ import { BsSun, BsMoon } from "react-icons/bs";
 import { AiOutlineLogout } from "react-icons/ai";
 import { AuthContext } from "../../states/context/AuthContext/AuthContext";
 import { ThemeContext } from "../../states/context/ThemeContext/ThemeContext";
+import ActionConfirmer from "./ActionConfirmer";
 const Navbar = () => {
   const navigate = useNavigate();
   const { visibility, updateVisibility } = useContext(ThemeContext);
   const { logoutAdmin } = useContext(AuthContext);
-  const handleLogout = () => {
+  const handleLogout = (anyString: string) => {
     logoutAdmin();
   };
   return (
@@ -20,15 +21,21 @@ const Navbar = () => {
         >
           Biller
         </div>
-        <div className="flex justify-between ">
+        <div className="flex justify-between items-center ">
           <div
             className="mx-8 cursor-pointer "
             onClick={() => updateVisibility()}
           >
             {!visibility ? <BsSun /> : <BsMoon />}
           </div>
-          <div className="cursor-pointer" onClick={handleLogout}>
-            {<AiOutlineLogout />}
+          <div className="cursor-pointer">
+            {
+              <ActionConfirmer
+                actionTag="Logout"
+                actionFunction={handleLogout}
+                parameter={undefined}
+              />
+            }
           </div>
         </div>
       </nav>

@@ -23,12 +23,6 @@ export default function SelectCountryStateCity({
   setSelectedState: Dispatch<SetStateAction<StateInfoType>>;
   setSelectedCity: Dispatch<SetStateAction<CityInfoType>>;
 }) {
-  // useEffect(() => {
-  //   console.log(selectedCountry);
-  //   console.log(selectedCountry?.isoCode);
-  //   console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
-  // }, [selectedCountry]);
-
   const countriesArr: CountryInfoType[] = Country.getAllCountries().map(
     (country) => ({
       name: country.name,

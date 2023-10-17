@@ -37,7 +37,7 @@ const addClientSlice = createSlice<
   name: "addClient",
   initialState: addClientInitialState,
   reducers: {
-    makeStateLoadingNeutralInAddClient: (state) => {
+    makeStateLoadingNeutralInAddClient: (state, action) => {
       return { ...state, loading: "idle" };
     },
   },

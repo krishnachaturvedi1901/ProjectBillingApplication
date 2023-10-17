@@ -44,7 +44,6 @@ export default function CompoAddClient({
   const [controlEditLoading, setControlEditLoading] = useState(false);
   const [addClientLoadingController, setAddClientLoadingController] =
     useState(false);
-  console.log(addClientLoadingController);
   //--------------------------------------------------------
   const [open, setOpen] = React.useState(false);
 
@@ -112,14 +111,14 @@ export default function CompoAddClient({
         dispatch(getClientByIdAction(clientToEdit?._id!));
       }
       enqueueSnackbar({
-        message: "Edit client successfull",
+        message: "Client edited successfull",
         variant: "success",
       });
       setFormError("");
       handleClose();
     } else if (editClientState.loading === "failed" && controlEditLoading) {
       setControlEditLoading(false);
-      setFormError(`${editClientState.error}`);
+      setFormError(`Error in updating client! Try again`);
       enqueueSnackbar({
         message: "Edit client failed",
         variant: "error",
@@ -143,29 +142,38 @@ export default function CompoAddClient({
   }, [adminId]);
 
   React.useEffect(() => {
-    console.log(
-      "Inside add client loding",
-      addClientLoading,
-      addClientLoadingController
-    );
-    if (addClientLoading === "succeeded" && addClientLoadingController) {
-      setAddClientLoadingController(false);
+    if (addClientLoading === "succeeded") {
+      // setAddClientLoadingController(false);
+      dispatch(makeStateLoadingNeutralInAddClient(true));
+      if (adminId) {
+        dispatch(getAllClientsByAdminIdAction(adminId));
+      }
       enqueueSnackbar({
         message: "Client added successfully",
         variant: "success",
       });
       setFormError("");
-      handleClose();
-    } else if (addClientLoading === "failed" && addClientLoadingController) {
-      setAddClientLoadingController(false);
+      // handleClose();
+    } else if (addClientLoading === "failed") {
+      // setAddClientLoadingController(false);
       setFormError(`${addClientError}`);
-      enqueueSnackbar({
-        message: "Error in adding client.Try again!",
-        variant: "error",
-      });
+      if (
+        addClientError ===
+        "Error in adding new client Error: Client with this name already exists"
+      ) {
+        enqueueSnackbar({
+          message: "Error, client with this name already exists.Try again!",
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar({
+          message: "Error in adding client.Try again!",
+          variant: "error",
+        });
+      }
+      dispatch(makeStateLoadingNeutralInAddClient(true));
     }
-    // dispatch(makeStateLoadingNeutralInAddClient());
-  }, [addClientLoading]);
+  }, [addClientLoading, addClientError]);
 
   React.useEffect(() => {
     setClientData({
@@ -262,11 +270,11 @@ export default function CompoAddClient({
     return true;
   }
 
-  const handleSubmit = () => {
+  const handleAddClientSubmit = () => {
     setClientData({ ...clientData, clientName: clientData.clientName.trim() });
     if (areAllFieldsFilled(clientData) && areEntriesValid(clientData)) {
-      setAddClientLoadingController(true);
       dispatch(addNewClientAction(clientData));
+      setAddClientLoadingController(true);
     } else {
       setIncompleteError("Incomplete fields");
     }
@@ -309,7 +317,7 @@ export default function CompoAddClient({
           />
         </Button>
       )}
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} /*onClose={handleClose}*/>
         <DialogTitle>
           {forEditClient ? "Edit Client" : "Add Client"}
         </DialogTitle>
@@ -467,7 +475,7 @@ export default function CompoAddClient({
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           {!forEditClient ? (
-            <Button onClick={handleSubmit}>Add Client</Button>
+            <Button onClick={handleAddClientSubmit}>Add Client</Button>
           ) : (
             <Button onClick={handleEditClientSubmit}>Edit Client</Button>
           )}

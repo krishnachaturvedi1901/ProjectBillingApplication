@@ -33,6 +33,7 @@ import CompoLoading from "./Compo-Loding";
 import { AuthContext } from "../../../states/context/AuthContext/AuthContext";
 import { CiEdit } from "react-icons/ci";
 import CompoAddClient from "./Compo_AddClient";
+import ActionConfirmer from "../../Navbar/ActionConfirmer";
 
 function ConfirmationDialogRaw(props: {
   onClose: (newValue: string) => void;
@@ -64,7 +65,6 @@ function ConfirmationDialogRaw(props: {
   }, [valueProp, open]);
 
   React.useEffect(() => {
-    console.log("deleteState=====>", deleteLoading, deleteData, deleteError);
     if (deleteLoading === "succeeded" && deleteData) {
       if (adminId) {
         dispatch(getAllClientsByAdminIdAction(adminId));
@@ -149,13 +149,11 @@ function ConfirmationDialogRaw(props: {
                 deletingClientIdString === client._id ? (
                   <CircularProgress size={25} />
                 ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => handleDeleteClient(client._id)}
-                  >
-                    <MdOutlineDeleteSweep
-                      size={25}
-                      className="text-thirdColor hover:text-violet-600 "
+                  <div className="cursor-pointer">
+                    <ActionConfirmer
+                      actionTag="Delete"
+                      actionFunction={handleDeleteClient}
+                      parameter={client._id}
                     />
                   </div>
                 )}

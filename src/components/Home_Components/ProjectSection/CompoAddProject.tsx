@@ -80,7 +80,6 @@ export default function CompoAddProject({
       parseInt(value) < 0
     ) {
       value = "0";
-      console.log("in work Field negative--->", value);
     }
     if (name === "rate" || name === "conversionRate") {
       let numVal = +value;
@@ -241,32 +240,13 @@ export default function CompoAddProject({
   }, [clientId, adminId]);
 
   const handleAddProjectClick = () => {
-    console.log("handleAddProject Called================>");
     handleToAddClick();
     handleClickOpen();
   };
   const handleEditProjectClick = () => {
-    console.log("handleEditProject Called==============>");
-
     handleToEditClick();
     handleClickOpen();
   };
-
-  // console.log(
-  //   "outside useEffect------------------------------>",
-  //   adminId,
-  //   clientId
-  // );
-  // console.log(
-  //   "toEdit",
-  //   toEdit,
-  //   "Add will render------------------------------------>",
-  //   forAddProject,
-  //   "Projectto edit obj",
-  //   projectToEdit,
-  //   "already project available-",
-  //   projectData
-  // );
 
   return (
     <>

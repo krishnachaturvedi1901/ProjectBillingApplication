@@ -22,7 +22,6 @@ import { useAddInvoiceMutation } from "../../../states/query/Invoice_queries/inv
 import { getAdminByIdAction } from "../../../states/redux/AdminStates/adminSlice";
 import generatePDF, { Margin, usePDF } from "react-to-pdf";
 import { RxCross1 } from "react-icons/rx";
-import DownloadPreview2 from "../DownloadSection/DownloadPreview2";
 import DownloadPreview from "../DownloadSection/DownloadPreview";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -157,7 +156,10 @@ export default function InvoiceDrawer() {
         // Save the PDF with a specific filename
         doc.save(`invoice${invoiceNo}.pdf`);
       } catch (error) {
-        console.error("Error generating PDF:", error);
+        enqueueSnackbar({
+          message: "Error generating PDF! Try again",
+          variant: "error",
+        });
       } finally {
         // Remove the temporary div
         document.body.removeChild(div);
@@ -188,7 +190,10 @@ export default function InvoiceDrawer() {
         const imgData = await canvas.toDataURL("image/png");
         setTempImgData(imgData);
       } catch (error) {
-        console.error("Error generating PDF:", error);
+        enqueueSnackbar({
+          message: "Error preview PDF! Try again",
+          variant: "error",
+        });
       } finally {
         // Remove the temporary div
         document.body.removeChild(div);
@@ -217,7 +222,7 @@ export default function InvoiceDrawer() {
     if (!newDate) {
       dispatch(updateInvoiceObjectStateAction({ dueDate: "" }));
 
-      return console.log("Invalid Date");
+      return;
     }
     if (newDate.isBefore(invoiceDate)) {
       enqueueSnackbar("Due date cannot be before invoice date.", {
@@ -250,7 +255,6 @@ export default function InvoiceDrawer() {
       });
       let tax = (amountPreTax * 18) / 100;
       let amountPostTax = +(amountPreTax + tax).toFixed(2);
-      console.log("amount pre and PostTax -", amountPreTax, amountPostTax);
       setAmountWithoutTax(amountPreTax);
       setAmountAfterTax(amountPostTax);
       setTaxAmount(tax);
@@ -291,32 +295,39 @@ export default function InvoiceDrawer() {
   }
 
   const AddInvoiceMutationHandler = useAddInvoiceMutation();
-  const handleInvoiceDownload = () => {
+  let timer = null;
+  const handleInvoiceDownload = (timer: any) => {
     setAllowDownload(false);
-    if (invoiceObject && allInvoiceFieldsAvailable(invoiceObject)) {
-      AddInvoiceMutationHandler.mutate(invoiceObject, {
-        onSuccess: () => {
-          enqueueSnackbar("Download successfull", { variant: "success" });
-          setPreviewAllowed(false);
-          dispatch(getAdminByIdAction(projectsForInvoice[0].adminId));
-          generateAndDownloadPDF();
-        },
-        onError: () => {
-          setAllowDownload(true);
-          enqueueSnackbar(
-            "Network error in save and download invoice. Try again!",
-            {
-              variant: "error",
-            }
-          );
-        },
-      });
-    } else {
-      enqueueSnackbar(
-        "Incomplete invoice details. Please fill invoice date <= due date.",
-        { variant: "error" }
-      );
+    if (timer) {
+      clearTimeout(timer);
     }
+    timer = setTimeout(() => {
+      if (invoiceObject && allInvoiceFieldsAvailable(invoiceObject)) {
+        AddInvoiceMutationHandler.mutate(invoiceObject, {
+          onSuccess: () => {
+            enqueueSnackbar("Download successfull", { variant: "success" });
+            setPreviewAllowed(false);
+            dispatch(getAdminByIdAction(projectsForInvoice[0].adminId));
+            generateAndDownloadPDF();
+          },
+          onError: () => {
+            setAllowDownload(true);
+            enqueueSnackbar(
+              "Network error in save and download invoice. Try again!",
+              {
+                variant: "error",
+              }
+            );
+          },
+        });
+      } else {
+        enqueueSnackbar(
+          "Incomplete invoice details. Please fill invoice date <= due date.",
+          { variant: "error" }
+        );
+      }
+      return () => clearTimeout(timer);
+    }, 1000);
   };
 
   const previewExecution = (value: boolean) => {
@@ -347,7 +358,7 @@ export default function InvoiceDrawer() {
           color: "white",
         }}
       >
-        <Button variant="contained" onClick={toggleDrawer(true)} sx={{}}>
+        <Button variant="contained" onClick={toggleDrawer(true)}>
           Invoice
         </Button>
       </Box>
@@ -428,33 +439,38 @@ export default function InvoiceDrawer() {
             >
               {windowWidth && windowWidth > 768 ? (
                 <>
-                  <DemoItem label="Invoice date">
+                  <DemoItem>
+                    <label style={{ color: textColor }}>Invoice date</label>
                     <DesktopDatePicker
                       defaultValue={invoiceDate}
                       onChange={(newDate) => handleInvoiceDateChange(newDate)}
                       format="DD/MM/YYYY"
-                      className="text-black dark:text-white"
+                      // label="Invoice date"
+                      sx={{ backgroundColor: "#cecece" }}
                     />
                   </DemoItem>
-                  <DemoItem label="Due date">
+                  <DemoItem>
+                    <label style={{ color: textColor }}>Due date</label>
                     <DesktopDatePicker
                       defaultValue={dueDate}
                       onChange={(newDate) => handleDueDateChange(newDate)}
                       format="DD/MM/YYYY"
-                      sx={{ color: textColor }}
+                      sx={{ backgroundColor: "#cecece" }}
                     />
                   </DemoItem>
                 </>
               ) : (
                 <>
-                  <DemoItem label="Invoice date">
+                  <DemoItem>
+                    <label style={{ color: textColor }}>Invoice date</label>
                     <MobileDatePicker
                       defaultValue={invoiceDate}
                       onChange={(newDate) => handleInvoiceDateChange(newDate)}
                       format="DD/MM/YYYY"
                     />
                   </DemoItem>
-                  <DemoItem label="Due date">
+                  <DemoItem>
+                    <label style={{ color: textColor }}>Due date</label>
                     <MobileDatePicker
                       defaultValue={dueDate}
                       onChange={(newDate) => handleDueDateChange(newDate)}
@@ -491,7 +507,7 @@ export default function InvoiceDrawer() {
                   </>
                 ) : (
                   <div className="flex justify-between ">
-                    IGST:(18%)<span>{taxAmount}</span>
+                    CGST:(18%)<span>{taxAmount}</span>
                   </div>
                 )}
               </Box>
@@ -528,7 +544,9 @@ export default function InvoiceDrawer() {
                 padding: { sm: "10px 25px" },
                 mr: { xs: "3px", sm: "35px", md: "40px" },
               }}
-              onClick={handleInvoiceDownload}
+              onClick={(timer) => {
+                handleInvoiceDownload(timer);
+              }}
               disabled={!allowDownload}
             >
               Download
