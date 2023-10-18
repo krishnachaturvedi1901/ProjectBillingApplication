@@ -15,6 +15,10 @@ export default function SelectCountryStateCity({
   setSelectedCountry,
   setSelectedState,
   setSelectedCity,
+  forEditClient,
+  countryString,
+  stateString,
+  cityString,
 }: {
   selectedCountry: CountryInfoType;
   selectedState: StateInfoType;
@@ -22,6 +26,10 @@ export default function SelectCountryStateCity({
   setSelectedCountry: Dispatch<SetStateAction<CountryInfoType>>;
   setSelectedState: Dispatch<SetStateAction<StateInfoType>>;
   setSelectedCity: Dispatch<SetStateAction<CityInfoType>>;
+  forEditClient: boolean;
+  countryString: string;
+  stateString: string;
+  cityString: string;
 }) {
   const countriesArr: CountryInfoType[] = Country.getAllCountries().map(
     (country) => ({
@@ -51,7 +59,10 @@ export default function SelectCountryStateCity({
   }));
 
   return (
-    <div className="my-2 flex flex-col gap-3">
+    <div className="my-2 flex flex-col">
+      <label className="text-xs py-1 opacity-60">
+        Country: {countryString}
+      </label>
       <Select
         options={countriesArr}
         getOptionLabel={(options) => {
@@ -67,6 +78,7 @@ export default function SelectCountryStateCity({
           }
         }}
       />
+      <label className="text-xs py-1 opacity-60">State: {stateString}</label>
       <Select
         options={statesArr}
         getOptionLabel={(options) => {
@@ -82,6 +94,7 @@ export default function SelectCountryStateCity({
           }
         }}
       />
+      <label className="text-xs py-1 opacity-60">City: {cityString}</label>
       <Select
         options={citiesArr}
         getOptionLabel={(options) => {

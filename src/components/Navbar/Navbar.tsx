@@ -8,7 +8,7 @@ import ActionConfirmer from "./ActionConfirmer";
 const Navbar = () => {
   const navigate = useNavigate();
   const { visibility, updateVisibility } = useContext(ThemeContext);
-  const { logoutAdmin } = useContext(AuthContext);
+  const { isAuth, logoutAdmin } = useContext(AuthContext);
   const handleLogout = (anyString: string) => {
     logoutAdmin();
   };
@@ -28,15 +28,17 @@ const Navbar = () => {
           >
             {!visibility ? <BsSun /> : <BsMoon />}
           </div>
-          <div className="cursor-pointer">
-            {
-              <ActionConfirmer
-                actionTag="Logout"
-                actionFunction={handleLogout}
-                parameter={undefined}
-              />
-            }
-          </div>
+          {isAuth ? (
+            <div className="cursor-pointer">
+              {
+                <ActionConfirmer
+                  actionTag="Logout"
+                  actionFunction={handleLogout}
+                  parameter={undefined}
+                />
+              }
+            </div>
+          ) : null}
         </div>
       </nav>
       <Outlet />

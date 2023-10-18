@@ -21,7 +21,13 @@ import {
 import { AppDispatch, RootState } from "../../../states/redux/store";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import { removeAllProjectsFromInvoiceAction } from "../../../states/redux/InvoiceProjectState/addProjectForInvoiceSlice";
-import { CircularProgress, useTheme } from "@mui/material";
+import {
+  CircularProgress,
+  Input,
+  TextField,
+  useTheme,
+  useThemeProps,
+} from "@mui/material";
 import {
   addDetelingClientIdInState,
   deleteClientAction,
@@ -46,6 +52,7 @@ function ConfirmationDialogRaw(props: {
   const dispatch = useDispatch<AppDispatch>();
   const { onClose, value: valueProp, open, adminId, ...other } = props;
   const [value, setValue] = React.useState(valueProp);
+  const [searchClientName, setSearchClientName] = React.useState("");
   const radioGroupRef = React.useRef(null);
   const { deleteLoading, deleteData, deleteError } = useSelector(
     (state: RootState) => state.deleteClientState
@@ -57,6 +64,7 @@ function ConfirmationDialogRaw(props: {
   } = useSelector((state: RootState) => state.allClientsState);
   const [deletingClientIdString, setDeletingClientIdString] =
     React.useState("");
+  const materialTheme = useTheme();
 
   React.useEffect(() => {
     if (!open) {
@@ -110,13 +118,34 @@ function ConfirmationDialogRaw(props: {
 
   return (
     <Dialog
-      sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 435 } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          width: "80%",
+          minHeight: { sm: 435 },
+          maxHeight: 435,
+        },
+      }}
       maxWidth="xs"
       TransitionProps={{ onEntering: handleEntering }}
       open={open}
       {...other}
     >
-      <DialogTitle>Select Client</DialogTitle>
+      <DialogTitle sx={{ mb: "-20px" }}>Select Client</DialogTitle>
+      <div className="mx-4">
+        <TextField
+          autoFocus
+          margin="dense"
+          id="SearchClientName"
+          label="Search by client name"
+          type="text"
+          fullWidth
+          variant="standard"
+          name="searchClientName"
+          value={searchClientName}
+          onChange={(e) => setSearchClientName(e.target.value)}
+        />
+      </div>
+
       <DialogContent dividers>
         {clientsLoading === "pending" ? (
           <CompoLoading forAllClients={true} forSelectClient={false} />
@@ -128,37 +157,52 @@ function ConfirmationDialogRaw(props: {
             value={value}
             onChange={(e) => handleChange(e)}
           >
-            {clients.map((client) => (
-              <div className="flex justify-between items-center">
-                <FormControlLabel
-                  value={client._id}
-                  control={<Radio />}
-                  label={client.clientName}
-                  sx={{
-                    width: "50%",
-                  }}
-                />
-                <div>
-                  <CompoAddClient
-                    forEditClient={true}
-                    clientToEdit={client}
-                    handleSelectClientClose={handleCancel}
+            {clients
+              .filter((ele) => {
+                if (searchClientName.length <= 0) {
+                  return true;
+                }
+                let searchQ = searchClientName.toLocaleLowerCase();
+                let clientName = ele.clientName.toLocaleLowerCase();
+                if (searchQ.length > clientName.length) {
+                  return false;
+                }
+                return (
+                  searchQ.localeCompare(clientName.slice(0, searchQ.length)) ===
+                  0
+                );
+              })
+              .map((client) => (
+                <div className="flex justify-between items-center">
+                  <FormControlLabel
+                    value={client._id}
+                    control={<Radio />}
+                    label={client.clientName}
+                    sx={{
+                      width: "50%",
+                    }}
                   />
-                </div>
-                {deleteLoading === "pending" &&
-                deletingClientIdString === client._id ? (
-                  <CircularProgress size={25} />
-                ) : (
-                  <div className="cursor-pointer">
-                    <ActionConfirmer
-                      actionTag="Delete"
-                      actionFunction={handleDeleteClient}
-                      parameter={client._id}
+                  <div>
+                    <CompoAddClient
+                      forEditClient={true}
+                      clientToEdit={client}
+                      handleSelectClientClose={handleCancel}
                     />
                   </div>
-                )}
-              </div>
-            ))}
+                  {deleteLoading === "pending" &&
+                  deletingClientIdString === client._id ? (
+                    <CircularProgress size={25} />
+                  ) : (
+                    <div className="cursor-pointer">
+                      <ActionConfirmer
+                        actionTag="Delete"
+                        actionFunction={handleDeleteClient}
+                        parameter={client._id}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
           </RadioGroup>
         )}
       </DialogContent>
@@ -178,7 +222,7 @@ ConfirmationDialogRaw.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-export default function ConfirmationDialog({}: {}) {
+export default function ConfirmationDialog() {
   const materialTheme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState<string>("");

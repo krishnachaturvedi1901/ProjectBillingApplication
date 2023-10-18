@@ -1,3 +1,5 @@
+import { E164Number } from "libphonenumber-js/core";
+
 export interface AdminType {
   _id?: string;
   companyName: string;
@@ -23,7 +25,7 @@ export interface ClientType {
   _id?: string;
   clientName: string;
   email: string;
-  contactNo: string;
+  contactNo: E164Number | undefined;
   pancardNo: string;
   address: {
     street: string;

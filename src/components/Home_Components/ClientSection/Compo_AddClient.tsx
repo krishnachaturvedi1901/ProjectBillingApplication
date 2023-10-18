@@ -30,6 +30,10 @@ import {
 } from "../../../states/redux/ClientStates/editClientSlice";
 import { getAllClientsByAdminIdAction } from "../../../states/redux/ClientStates/allClientSlice";
 import { getClientByIdAction } from "../../../states/redux/ClientStates/selectedClientSlice";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
+import { E164Number } from "libphonenumber-js/core";
+import "../../../styles/addClient.css";
 
 export default function CompoAddClient({
   forEditClient,
@@ -89,7 +93,7 @@ export default function CompoAddClient({
     contactNo: "",
     pancardNo: "",
     gistin: "",
-    conversionRate: 80,
+    conversionRate: 83,
     address: {
       street: "",
       city: selectedCountry.name,
@@ -175,6 +179,42 @@ export default function CompoAddClient({
     }
   }, [addClientLoading, addClientError]);
 
+  // ----------------Change of Country State City----------------------
+
+  React.useEffect(() => {
+    setClientData({
+      ...clientData,
+      address: {
+        ...clientData.address,
+        country: selectedCountry.name,
+        state: "",
+        city: "",
+      },
+    });
+    if (adminId) {
+      setClientData((prev) => {
+        return { ...prev, user: adminId };
+      });
+    }
+  }, [selectedCountry]);
+
+  React.useEffect(() => {
+    setClientData({
+      ...clientData,
+      address: {
+        ...clientData.address,
+        country: selectedCountry.name,
+        state: selectedState.name,
+        city: "",
+      },
+    });
+    if (adminId) {
+      setClientData((prev) => {
+        return { ...prev, user: adminId };
+      });
+    }
+  }, [selectedState]);
+
   React.useEffect(() => {
     setClientData({
       ...clientData,
@@ -190,7 +230,9 @@ export default function CompoAddClient({
         return { ...prev, user: adminId };
       });
     }
-  }, [selectedCountry, selectedState, selectedCity]);
+  }, [selectedCity]);
+
+  // ------------------------------------------------------------------
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -213,6 +255,10 @@ export default function CompoAddClient({
     setFormError("");
     setIncompleteError("");
   };
+  console.log(clientData);
+  const handleMobileNoChange = (e: E164Number | undefined) => {
+    setClientData({ ...clientData, contactNo: e });
+  };
 
   function areAllFieldsFilled(obj: any) {
     for (const key in obj) {
@@ -234,7 +280,7 @@ export default function CompoAddClient({
     if (clientNameTemp.length < 2) {
       setFormError("Client name minimum length is 2");
       return false;
-    } else if (obj.contactNo.length !== 10) {
+    } else if (obj.contactNo.length !== 13) {
       setFormError("Contactno. must be of 10 digit only.");
       return false;
     } else if (obj.clientName.length > 50 || obj.clientName.length < 2) {
@@ -357,22 +403,20 @@ export default function CompoAddClient({
             onChange={(e) => handleChange(e)}
             required
           />
-          <TextField
-            margin="dense"
-            id="contactNo"
-            label="Contact Number"
-            type="number"
-            fullWidth
-            variant="standard"
-            name="contactNo"
-            value={clientData.contactNo}
-            onChange={(e) => handleChange(e)}
-            required
-            inputProps={{
-              pattern: "[0-9]{10}",
-              title: "Please enter valid mobile number",
-            }}
-          />
+          <div className="py-2 border-b border-b-slate-400 hover:border-b-black hover:border-b-2 ">
+            <label className="text-sm text-gray-500 hover:text-thirdColorHover ">
+              Contact No.
+            </label>
+            <PhoneInput
+              defaultCountry="IN"
+              international
+              countryCallingCodeEditable={false}
+              placeholder="Enter phone number"
+              value={clientData.contactNo}
+              onChange={(e) => handleMobileNoChange(e)}
+              className="border-none pt-2  PhoneInputInput"
+            />
+          </div>
           <TextField
             margin="dense"
             id="pancardNo"
@@ -433,19 +477,6 @@ export default function CompoAddClient({
             {" "}
             Select Region
           </Typography>
-          {forEditClient ? (
-            <label className="text-xs my-8">
-              <span>
-                Country:<b>{clientData.address.country}</b> |{" "}
-              </span>
-              <span>
-                State:<b>{clientData.address.state}</b> |
-              </span>{" "}
-              <span>
-                City:<b>{clientData.address.city}</b>
-              </span>
-            </label>
-          ) : null}
           <SelectCountryStateCity
             selectedCountry={selectedCountry}
             selectedState={selectedState}
@@ -453,6 +484,10 @@ export default function CompoAddClient({
             setSelectedCountry={setSelectedCountry}
             setSelectedState={setSelectedState}
             setSelectedCity={setSelectedCity}
+            forEditClient={forEditClient}
+            countryString={clientData.address.country}
+            stateString={clientData.address.state}
+            cityString={clientData.address.city}
           />
           <TextField
             margin="dense"
