@@ -9,7 +9,7 @@ const Home = () => {
     <main className=" bg-slate-200 dark:bg-slate-700 min-h-[150vh] text-colorDarkFont dark:text-colorLightFont overflow-x-hidden ">
       <SelectClient />
       <ProjectTable />
-      {/* <BillAmount /> */}
+      <BillAmount />
     </main>
   );
 };

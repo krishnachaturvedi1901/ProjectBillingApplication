@@ -132,7 +132,7 @@ const ProjectTable = () => {
   };
 
   return (
-    <section className="">
+    <section className="pb-14 ">
       <div>
         <CompoAddProject
           clientId={selectedClientState.data._id}
@@ -195,7 +195,10 @@ const ProjectTable = () => {
                       <label>{index + 1}</label>
                     </div>
                   </td>
-                  <td data-label="Project" className="td">
+                  <td
+                    data-label="Project"
+                    className="td overflow-hidden overflow-ellipsis"
+                  >
                     {project.projectName}
                     <br />
                     {project.projectManager}
@@ -265,7 +268,7 @@ const ProjectTable = () => {
           </tbody>
         </table>
       </div>
-      <BillAmount />
+      {/* <BillAmount /> */}
     </section>
   );
 };

@@ -52,12 +52,10 @@ export default function InvoiceDrawer() {
   const [open, setOpen] = React.useState(false);
   const [tempImgData, setTempImgData] = React.useState("");
   const [allowDownload, setAllowDownload] = React.useState(true);
-  const [bgColorHeadStyledBox, setBgColorHeadStyledBox] = React.useState(
-    "#151e2d"
-  );
-  const [bgColorBodyStyledBox, setBgColorBodyStyledBox] = React.useState(
-    "#334155"
-  );
+  const [bgColorHeadStyledBox, setBgColorHeadStyledBox] =
+    React.useState("#151e2d");
+  const [bgColorBodyStyledBox, setBgColorBodyStyledBox] =
+    React.useState("#334155");
   const [textColor, setTextColor] = React.useState("whitesmoke");
 
   const { enqueueSnackbar } = useSnackbar();
@@ -146,7 +144,7 @@ export default function InvoiceDrawer() {
     // Create a div to render your component
     const div = document.createElement("div");
     div.style.width = "1050px";
-    div.style.height = "1000px";
+    div.style.height = "1124px";
     document.body.appendChild(div);
 
     const root = createRoot(div);
